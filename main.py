@@ -255,5 +255,11 @@ def scrape_all_details_from_recipes(recipes_dict):
             time.sleep(5)
 
 
+# Function dumping scraped recipes to JSON file for further processing
+def save_recipes_to_json(recipes_dict):
+    with open('recipes.json', 'w') as file:
+        json.dump(recipes_dict, file)
+
+
 if __name__ == '__main__':
     pass
