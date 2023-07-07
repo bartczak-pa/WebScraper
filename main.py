@@ -1,5 +1,6 @@
 import requests
 import time
+import json
 from bs4 import BeautifulSoup
 
 # Here will  be stored all scraped recipes
@@ -30,9 +31,6 @@ def scrape_categories():
             all_recipes[category_name] = {
                 'url': category_url
             }
-
-    # Printing amount of scraped category links
-    print(f'Scraped links to {len(all_recipes)} categories')
 
 
 # Function scraping Recipe titles and URL`s from one category
@@ -89,6 +87,172 @@ def scrape_recipes_from_all_categories(recipes_dict):
         scrape_recipes_from_category(category_name, str(category_url))
 
         print(f'Finished scraping category {category_name}')
+
+
+def scrape_recipe_details(category, recipe_name, recipe_url):
+    r = requests.get(recipe_url)
+    soup = BeautifulSoup(r.content, "html.parser")
+
+    # Find <div> element with class "wprm-recipe-container"
+    recipe_container = soup.find("div", class_="wprm-recipe-container")
+
+    """As some recipe pages are general articles and don't include times or ingredients, we have to check existence of
+    specific fields. Functions below are responsible for scraping those details. Some of recipes have saved times in
+    <span> elements with different classes (minutes/hours)
+    """
+
+    def get_cook_time():
+        try:
+            # Find <span> element containing cook time in minutes
+            cook_time_content = recipe_container.find('span', class_='wprm-recipe-cook_time-minutes')
+            return cook_time_content.text
+        except AttributeError:
+            try:
+                # Find <span> element containing recipe time in hours
+                cook_time_content = recipe_container.find('span', class_='wprm-recipe-cook_time-hours')
+                return cook_time_content.text
+            except AttributeError:
+                cook_time_content = 0
+                return cook_time_content
+
+    def get_prep_time():
+        try:
+            # Find <span> element containing prep time in minutes
+            prep_time_content = recipe_container.find('span', class_='wprm-recipe-details-minutes')
+            return prep_time_content.text
+
+        except AttributeError:
+            try:
+                # Find <span> element containing prep time in hours
+                prep_time_content = recipe_container.find('span', class_='wprm-recipe-details-hours')
+                return prep_time_content.text
+
+            except AttributeError:
+                prep_time_content = 0
+                return prep_time_content
+
+    def get_total_time():
+        try:
+            # Find <span> element containing total time in minutes
+            total_time_content = recipe_container.find('span', class_='wprm-recipe-total_time-minutes')
+            return total_time_content.text
+
+        except AttributeError:
+            try:
+                # Find <span> element containing prep time in hours
+                total_time_content = recipe_container.find('span', class_='wprm-recipe-total_time-hours')
+                return total_time_content.text
+
+            except AttributeError:
+                total_time_content = 0
+                return total_time_content
+
+    def get_courses():
+        try:
+            # Find <span> element containing recipe courses
+            course = recipe_container.find("span", class_="wprm-recipe-course")
+            courses = course.text.split(',')
+            return courses
+
+        except AttributeError:
+            courses = ''
+            return courses
+
+    def get_cuisine():
+        try:
+            # Find <span> element containing recipe cuisine
+            cuisine_content = recipe_container.find('span', class_='wprm-recipe-cuisine')
+            return cuisine_content.text
+
+        except AttributeError:
+            cuisine_content = ''
+            return cuisine_content
+
+    def get_servings():
+        try:
+            # Find <span> element containing recipe servings
+            servings_content = recipe_container.find("span", class_="wprm-recipe-servings")
+            return servings_content.text
+
+        except AttributeError:
+            servings_content = 0
+            return servings_content
+
+    def get_calories():
+        try:
+            # Find <span> element containing recipe calories
+            calories_content = recipe_container.find('span', class_="wprm-recipe-calories")
+            return calories_content.text
+
+        except AttributeError:
+            calories_content = 0
+            return calories_content
+
+    def get_ingredients():
+        try:
+            # Find <ul> element containing recipe ingredients
+            ingredients_container = recipe_container.find("ul", class_="wprm-recipe-ingredients")
+
+            # Extract ingredients and amounts to the lists
+            ingredient_names = [ingredient_name.find("span", class_="wprm-recipe-ingredient-name").text for
+                                ingredient_name in
+                                ingredients_container]
+
+            ingredient_amounts = [ingredient_amount.find("span").text for ingredient_amount in ingredients_container]
+
+            # Here will be stored data representing each ingredient and its value
+            ingredients_dict = {}
+
+            # Add ingredients names and amounts to dict
+            for ingredient_name, amount in zip(ingredient_names, ingredient_amounts):
+                ingredients_dict[ingredient_name] = amount
+
+            return ingredients_dict
+
+        except AttributeError:
+            ingredients_dict = {}
+            return ingredients_dict
+
+    def get_instructions():
+        try:
+
+            # Find <ul> element containing instructions
+            instructions_container = soup.find("ul", class_="wprm-recipe-instructions")
+
+            # Adding instructions to the list
+            instructions_list = [step.text for step in instructions_container]
+            return instructions_list
+
+        except AttributeError and TypeError:
+            return []
+
+    # Dictionary with data for update main dictionary
+    recipe_content = {
+        'prep_time': get_prep_time(),
+        'cook_time': get_cook_time(),
+        'total_time': get_total_time(),
+        'courses': get_courses(),
+        'cuisine': get_cuisine(),
+        'servings': get_servings(),
+        'calories': get_calories(),
+        'ingredients': get_ingredients(),
+        'instructions': get_instructions()
+    }
+
+    # Updating main dictionary with scraped recipe names and urls
+    all_recipes[category]['Recipes'][recipe_name].update({'Content': recipe_content})
+
+    print(f'Scraped details from {recipe_name}')
+
+
+# Function scraping all recipes details from provided dictionary
+def scrape_all_details_from_recipes(recipes_dict):
+    for category, category_values in recipes_dict.items():
+        category_recipes = category_values["Recipes"]
+
+        for recipe_name, recipe_values in category_recipes.items():
+            scrape_recipe_details(category, recipe_name, recipe_values['url'])
+            time.sleep(5)
 
 
 if __name__ == '__main__':
