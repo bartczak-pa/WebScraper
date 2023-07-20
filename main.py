@@ -31,6 +31,7 @@ def scrape_categories():
             all_recipes[category_name] = {
                 'url': category_url
             }
+    print(f'Scraped titles and URL`s to {len(all_recipes)} categories')
 
 
 # Function scraping Recipe titles and URL`s from one category
@@ -39,11 +40,25 @@ def scrape_recipes_from_category(category_name, category_url):
     is_have_next_page = True
     page = 1
 
+    # Helper function returning amount of pages containing recipes from category
+    def check_number_of_pages(url):
+        request = requests.get(url)
+        number_soup = BeautifulSoup(request.content, "html.parser")
+
+        pages_amount = int(
+            str(number_soup.find("li", class_='pagination-next').find_previous("li").find('a').contents[-1]).strip())
+
+        print(f'Category {category_name} have {pages_amount} pages.')
+        return pages_amount
+
+    pages = check_number_of_pages(category_url)
+
     # Here will be stored all scraped recipe names and URL`s
     category_recipes = {}
 
     # Loop checking pagination on the category page
     while is_have_next_page:
+        print(f'Scraping page number {page} from {pages} pages.')
 
         r = requests.get(f'{category_url}page/{page}')
         soup = BeautifulSoup(str(r.content), "html.parser")
@@ -76,7 +91,6 @@ def scrape_recipes_from_category(category_name, category_url):
         # Preventing overloading page with requests
         time.sleep(2)
         page += 1
-        print(f'Changing to page {page} in category {category_name}')
 
 
 # Function scraping all recipes from provided category dictionary
@@ -85,7 +99,6 @@ def scrape_recipes_from_all_categories(recipes_dict):
         category_name = category
         category_url = values['url']
         scrape_recipes_from_category(category_name, str(category_url))
-
         print(f'Finished scraping category {category_name}')
 
 
@@ -252,7 +265,7 @@ def scrape_all_details_from_recipes(recipes_dict):
 
         for recipe_name, recipe_values in category_recipes.items():
             scrape_recipe_details(category, recipe_name, recipe_values['url'])
-            time.sleep(5)
+            time.sleep(2)
 
 
 # Function dumping scraped recipes to JSON file for further processing
@@ -262,4 +275,7 @@ def save_recipes_to_json(recipes_dict):
 
 
 if __name__ == '__main__':
-    pass
+    scrape_categories()
+    # scrape_recipes_from_all_categories(all_recipes)
+    # scrape_all_details_from_recipes(all_recipes)
+    # save_recipes_to_json(all_recipes)
