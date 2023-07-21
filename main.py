@@ -2,6 +2,7 @@ import requests
 import time
 import json
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 # Here will  be stored all scraped recipes
 all_recipes = {}
@@ -48,17 +49,16 @@ def scrape_recipes_from_category(category_name, category_url):
         pages_amount = int(
             str(number_soup.find("li", class_='pagination-next').find_previous("li").find('a').contents[-1]).strip())
 
-        print(f'Category {category_name} have {pages_amount} pages.')
         return pages_amount
 
-    pages = check_number_of_pages(category_url)
+    # In this variable
+    pages_num = check_number_of_pages(category_url)
 
     # Here will be stored all scraped recipe names and URL`s
     category_recipes = {}
 
-    # Loop checking pagination on the category page
-    while is_have_next_page:
-        print(f'Scraping page number {page} from {pages} pages.')
+    # Loop iterating through all category pages. Use tqdm for displaying inner progress bar in console.
+    for i in tqdm(range(pages_num), desc=f'Scraping recipes from {category_name}', position=1, leave=False):
 
         r = requests.get(f'{category_url}page/{page}')
         soup = BeautifulSoup(str(r.content), "html.parser")
@@ -84,22 +84,23 @@ def scrape_recipes_from_category(category_name, category_url):
         # Updating main dictionary with scraped recipe names and urls
         all_recipes[category_name].update({'Recipes': category_recipes})
 
-        # Checking next pagination on category page
-        if soup.find("li", class_='pagination-next') is None:
-            is_have_next_page = False
-
         # Preventing overloading page with requests
         time.sleep(2)
-        page += 1
 
 
 # Function scraping all recipes from provided category dictionary
 def scrape_recipes_from_all_categories(recipes_dict):
-    for category, values in recipes_dict.items():
+
+    """
+    This loop iterates through all categories and scraping URL's to all recipes.
+
+    Used tqdm for displaying progress bar in console
+
+    """
+    for category, values in tqdm(recipes_dict.items(), desc="Scraping recipe URL`s from all categories: ", position=0):
         category_name = category
         category_url = values['url']
         scrape_recipes_from_category(category_name, str(category_url))
-        print(f'Finished scraping category {category_name}')
 
 
 def scrape_recipe_details(category, recipe_name, recipe_url):
@@ -255,16 +256,23 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
     # Updating main dictionary with scraped recipe names and urls
     all_recipes[category]['Recipes'][recipe_name].update({'Content': recipe_content})
 
-    print(f'Scraped details from {recipe_name}')
-
 
 # Function scraping all recipes details from provided dictionary
 def scrape_all_details_from_recipes(recipes_dict):
-    for category, category_values in recipes_dict.items():
+
+    """
+    This loop iterates through all recipes in dict and scraping their details.
+
+    Used tqdm for displaying progress bar in console
+    """
+    for category, category_values in tqdm(recipes_dict.items(), desc="Scraping recipes details from all categories: "):
         category_recipes = category_values["Recipes"]
 
-        for recipe_name, recipe_values in category_recipes.items():
+        for recipe_name, recipe_values in tqdm(category_recipes.items(),
+                                               desc=f'Scraping recipe details from {category}'):
             scrape_recipe_details(category, recipe_name, recipe_values['url'])
+
+            # Preventing overload server with requests
             time.sleep(2)
 
 
@@ -272,6 +280,12 @@ def scrape_all_details_from_recipes(recipes_dict):
 def save_recipes_to_json(recipes_dict):
     with open('recipes.json', 'w') as file:
         json.dump(recipes_dict, file)
+
+
+def load_recipes():
+    file = open('recipes.json')
+    data = json.load(file)
+    return data
 
 
 if __name__ == '__main__':
