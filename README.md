@@ -13,10 +13,10 @@ It uses Beautiful Soup to navigate the HTML structure and retrieve desired eleme
 
 ## Features
 
-- Fetches HTML content from a specific URL
+- Fetches recipes content from a [Bianca Zapatka blog](https://biancazapatka.com/)
 - Parses the HTML using Beautiful Soup
 - Extracts data based on specified CSS selectors
-- Outputs the extracted data in a desired format (CSV, JSON)
+- Saves extracted data to JSON file for further processing
 
 ## Prerequisites
 
@@ -28,11 +28,14 @@ Make sure you have the following installed on your system:
 ## Usage
 
 1. Clone the repository:
+   - Open Terminal.
+   - Change the current working directory to the location where you want the cloned directory.
+   - Type `git clone https://github.com/bartczak-pa/WebScraper.git`
+   - Press Enter to create your local clone.
 
 2. Create and activate a virtual environment:
    - Create virtual environment (type `python -m venv myenv`)
    - Activate virtual environment (type `source myenv/bin/activate'`)
-   
 
 3. Activate Script
    - Activate script by typing `python main.py`

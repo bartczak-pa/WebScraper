@@ -5,11 +5,11 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 # Here will  be stored all scraped recipes
-all_recipes = {}
+recipes = {}
 
 
 # Function scraping category names and their URLs for further processing
-def scrape_categories():
+def scrape_category_urls():
     r = requests.get('https://biancazapatka.com/en/recipe-index/')
     soup = BeautifulSoup(r.content, 'html.parser')
 
@@ -29,14 +29,14 @@ def scrape_categories():
             category_url = category_links[0].find("a").get("href")
 
             # Saving category name and link to the dictionary
-            all_recipes[category_name] = {
+            recipes[category_name] = {
                 'url': category_url
             }
-    print(f'Scraped titles and URL`s to {len(all_recipes)} categories')
+    print(f'Scraped titles and URL`s to {len(recipes)} categories \n')
 
 
 # Function scraping Recipe titles and URL`s from one category
-def scrape_recipes_from_category(category_name, category_url):
+def scrape_recipes_urls(category_name, category_url):
     # Variables needed for pagination check loop
     is_have_next_page = True
     page = 1
@@ -82,25 +82,24 @@ def scrape_recipes_from_category(category_name, category_url):
             }
 
         # Updating main dictionary with scraped recipe names and urls
-        all_recipes[category_name].update({'Recipes': category_recipes})
+        recipes[category_name].update({'Recipes': category_recipes})
 
         # Preventing overloading page with requests
         time.sleep(2)
 
 
 # Function scraping all recipes from provided category dictionary
-def scrape_recipes_from_all_categories(recipes_dict):
-
+def scrape_recipes_urls_from_all_categories():
     """
-    This loop iterates through all categories and scraping URL's to all recipes.
+    This loop iterates through all categories and scraping URLs to all recipes.
 
     Used tqdm for displaying progress bar in console
 
     """
-    for category, values in tqdm(recipes_dict.items(), desc="Scraping recipe URL`s from all categories: ", position=0):
+    for category, values in tqdm(recipes.items(), desc="Scraping recipe URL`s from all categories: ", position=0):
         category_name = category
         category_url = values['url']
-        scrape_recipes_from_category(category_name, str(category_url))
+        scrape_recipes_urls(category_name, str(category_url))
 
 
 def scrape_recipe_details(category, recipe_name, recipe_url):
@@ -254,18 +253,17 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
     }
 
     # Updating main dictionary with scraped recipe names and urls
-    all_recipes[category]['Recipes'][recipe_name].update({'Content': recipe_content})
+    recipes[category]['Recipes'][recipe_name].update({'Content': recipe_content})
 
 
 # Function scraping all recipes details from provided dictionary
-def scrape_all_details_from_recipes(recipes_dict):
-
+def scrape_details_from_all_recipes():
     """
     This loop iterates through all recipes in dict and scraping their details.
 
     Used tqdm for displaying progress bar in console
     """
-    for category, category_values in tqdm(recipes_dict.items(), desc="Scraping recipes details from all categories: "):
+    for category, category_values in tqdm(recipes.items(), desc="Scraping recipes details from all categories: "):
         category_recipes = category_values["Recipes"]
 
         for recipe_name, recipe_values in tqdm(category_recipes.items(),
@@ -282,6 +280,7 @@ def save_recipes_to_json(recipes_dict):
         json.dump(recipes_dict, file)
 
 
+# Helper function loading json file as recipes dictionary
 def load_recipes():
     file = open('recipes.json')
     data = json.load(file)
@@ -289,7 +288,13 @@ def load_recipes():
 
 
 if __name__ == '__main__':
-    scrape_categories()
-    # scrape_recipes_from_all_categories(all_recipes)
-    # scrape_all_details_from_recipes(all_recipes)
-    # save_recipes_to_json(all_recipes)
+    print("Welcome in my Web Scraper! Process will start in a moment, please wait...")
+    time.sleep(10)
+
+    scrape_category_urls()
+    time.sleep(7)
+
+    scrape_recipes_urls_from_all_categories()
+    time.sleep(7)
+
+    scrape_details_from_all_recipes()
