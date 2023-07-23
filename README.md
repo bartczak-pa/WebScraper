@@ -6,10 +6,16 @@ a Python library for parsing HTML and XML documents.
 
 ## Description
 
-This web scraper is design to extract recipes from the Bianca Zapatka blog.
-It uses Beautiful Soup to navigate the HTML structure and retrieve desired elements based on specified selectors.
+This is my first portfolio project showing Python Codings skills.
+This web scraper is designed to extract recipes from the [Bianca Zapatka Blog](https://biancazapatka.com/)
 
- 
+The app task is to scrape recipes from Culinary Blog and save them to JSON file. 
+
+### Used libraries
+
+**Beautiful Soup 4** - Well known web scraper which allows parse HTML files and extract desired data.
+
+**tqdm** - Python library responsible for displaying progress bars
 
 ## Features
 
@@ -34,8 +40,10 @@ Make sure you have the following installed on your system:
    - Press Enter to create your local clone.
 
 2. Create and activate a virtual environment:
-   - Create virtual environment (type `python -m venv myenv`)
-   - Activate virtual environment (type `source myenv/bin/activate'`)
+   - Create virtual environment (type `python3 -m venv env`)
+   - Activate virtual environment (type `source env/bin/activate'`)
+   - Open app directory (type `cd WebScraper'`)
+   - Install dependencies (type `python3 -m pip install -r requirements.txt'`)
 
 3. Activate Script
    - Activate script by typing `python main.py`
