@@ -3,6 +3,7 @@ import requests
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+from file_processing import save_data_to_json
 
 recipes = {}
 PAGE_URL = 'https://biancazapatka.com/en/recipe-index/'
@@ -41,13 +42,12 @@ def scrape_category_urls():
                 recipes[category_name] = {
                     'url': category_url
                 }
-
+        save_data_to_json(recipes, 'category_urls.json')
         print(f'Scraped titles and URL`s to {len(recipes)} categories \n')
 
 
 # Function scraping Recipe titles and URL`s from one category
 def scrape_recipes_urls(category_name: str, category_url: str):
-
     # Helper function returning amount of pages containing recipes from category
     def check_number_of_pages(url: str) -> int:
 
@@ -101,6 +101,7 @@ def scrape_recipes_urls(category_name: str, category_url: str):
 
         # Updating main dictionary with scraped recipe names and urls
         recipes[category_name].update({'Recipes': category_recipes})
+        save_data_to_json(recipes, 'recipes_urls.json')
 
         # Preventing overloading page with requests
         time.sleep(2)
@@ -225,6 +226,7 @@ def scrape_recipe_details(category: str, recipe_name: str, recipe_url: str):
             ingredients_container = recipe_container.find("ul", class_="wprm-recipe-ingredients")
 
             # Extract ingredients and amounts to the lists
+            # noinspection PyArgumentList
             ingredient_names = [ingredient_name.find("span", class_="wprm-recipe-ingredient-name").text for
                                 ingredient_name in
                                 ingredients_container]
@@ -272,6 +274,7 @@ def scrape_recipe_details(category: str, recipe_name: str, recipe_url: str):
 
     # Updating main dictionary with scraped recipe names and urls
     recipes[category]['Recipes'][recipe_name].update({'Content': recipe_content})
+    save_data_to_json(recipes, 'recipes_file.json')
 
 
 # Function scraping all recipes details from provided dictionary
