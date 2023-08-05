@@ -14,3 +14,4 @@ if __name__ == '__main__':
     time.sleep(7)
 
     scraper.scrape_details_from_all_recipes()
+
