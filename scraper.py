@@ -5,12 +5,13 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 recipes = {}
+PAGE_URL = 'https://biancazapatka.com/en/recipe-index/'
 
 
 # Function scraping category names and their URLs for further processing
 def scrape_category_urls():
     try:
-        r = requests.get('https://biancazapatka.com/en/recipe-index/')
+        r = requests.get(PAGE_URL)
         r.raise_for_status()
     except requests.exceptions.ConnectionError as err:
         raise SystemExit(err)
@@ -45,9 +46,10 @@ def scrape_category_urls():
 
 
 # Function scraping Recipe titles and URL`s from one category
-def scrape_recipes_urls(category_name, category_url):
+def scrape_recipes_urls(category_name: str, category_url: str):
+
     # Helper function returning amount of pages containing recipes from category
-    def check_number_of_pages(url):
+    def check_number_of_pages(url: str) -> int:
 
         try:
             request = requests.get(url)
@@ -58,13 +60,13 @@ def scrape_recipes_urls(category_name, category_url):
         pages_num_soup = BeautifulSoup(request.content, "html.parser")
 
         try:
-            pag_amount = int(
+            pages = int(
                 str(pages_num_soup.find("li", class_='pagination-next').find_previous("li").find('a').contents[
                         -1]).strip())
         except AttributeError:
-            pag_amount = 1
+            pages = 1
 
-        return pag_amount
+        return pages
 
     # In this variable will be stored amount of pages containing recipes from category
     pages_amount = check_number_of_pages(category_url)
@@ -118,7 +120,7 @@ def scrape_recipes_urls_from_all_categories():
         scrape_recipes_urls(category_name, category_url)
 
 
-def scrape_recipe_details(category, recipe_name, recipe_url):
+def scrape_recipe_details(category: str, recipe_name: str, recipe_url: str):
     r = requests.get(recipe_url)
     soup = BeautifulSoup(r.content, "html.parser")
 
@@ -130,7 +132,7 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
     <span> elements with different classes (minutes/hours)
     """
 
-    def get_cook_time():
+    def get_cook_time() -> str:
         try:
             # Find <span> element containing cook time in minutes
             cook_time_content = recipe_container.find('span', class_='wprm-recipe-cook_time-minutes')
@@ -141,10 +143,10 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
                 cook_time_content = recipe_container.find('span', class_='wprm-recipe-cook_time-hours')
                 return cook_time_content.text
             except AttributeError:
-                cook_time_content = 0
+                cook_time_content = '0'
                 return cook_time_content
 
-    def get_prep_time():
+    def get_prep_time() -> str:
         try:
             # Find <span> element containing prep time in minutes
             prep_time_content = recipe_container.find('span', class_='wprm-recipe-details-minutes')
@@ -157,10 +159,10 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
                 return prep_time_content.text
 
             except AttributeError:
-                prep_time_content = 0
+                prep_time_content = '0'
                 return prep_time_content
 
-    def get_total_time():
+    def get_total_time() -> str:
         try:
             # Find <span> element containing total time in minutes
             total_time_content = recipe_container.find('span', class_='wprm-recipe-total_time-minutes')
@@ -173,10 +175,10 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
                 return total_time_content.text
 
             except AttributeError:
-                total_time_content = 0
+                total_time_content = '0'
                 return total_time_content
 
-    def get_courses():
+    def get_courses() -> list:
         try:
             # Find <span> element containing recipe courses
             course = recipe_container.find("span", class_="wprm-recipe-course")
@@ -184,10 +186,10 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
             return courses
 
         except AttributeError:
-            courses = ''
+            courses = []
             return courses
 
-    def get_cuisine():
+    def get_cuisine() -> str:
         try:
             # Find <span> element containing recipe cuisine
             cuisine_content = recipe_container.find('span', class_='wprm-recipe-cuisine')
@@ -197,27 +199,27 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
             cuisine_content = ''
             return cuisine_content
 
-    def get_servings():
+    def get_servings() -> str:
         try:
             # Find <span> element containing recipe servings
             servings_content = recipe_container.find("span", class_="wprm-recipe-servings")
             return servings_content.text
 
         except AttributeError:
-            servings_content = 0
+            servings_content = ''
             return servings_content
 
-    def get_calories():
+    def get_calories() -> str:
         try:
             # Find <span> element containing recipe calories
             calories_content = recipe_container.find('span', class_="wprm-recipe-calories")
             return calories_content.text
 
         except AttributeError:
-            calories_content = 0
+            calories_content = '0'
             return calories_content
 
-    def get_ingredients():
+    def get_ingredients() -> dict:
         try:
             # Find <ul> element containing recipe ingredients
             ingredients_container = recipe_container.find("ul", class_="wprm-recipe-ingredients")
@@ -242,7 +244,7 @@ def scrape_recipe_details(category, recipe_name, recipe_url):
             ingredients_dict = {}
             return ingredients_dict
 
-    def get_instructions():
+    def get_instructions() -> list:
         try:
 
             # Find <ul> element containing instructions
