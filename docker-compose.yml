@@ -1,0 +1,5 @@
+services:
+  web:
+    build: .
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
