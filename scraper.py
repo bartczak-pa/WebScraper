@@ -34,7 +34,7 @@ def scrape_category_urls():
             if category_links and category_name:
                 category_url = category_links[0].find("a").get("href")
                 recipes[category_name] = {'url': category_url}
-        save_data_to_json(recipes, 'category_urls.json')
+        save_data_to_json(recipes, 'json_files/category_urls.json')
         print(f'Scraped titles and URL`s to {len(recipes)} categories \n')
 
 
@@ -87,11 +87,11 @@ def scrape_recipes_urls(category_name: str, category_url: str):
                 'url': recipe_url
             }
 
-        recipes[category_name].update({'Recipes': category_recipes})
-        save_data_to_json(recipes, 'recipes_urls.json')
+        recipes[category_name].update({'recipes': category_recipes})
+        save_data_to_json(recipes, 'json_files/recipes_urls.json')
 
         # Preventing overloading page with requests
-        time.sleep(2)
+        time.sleep(1)
 
 
 # Function scraping all recipes from provided category dictionary
@@ -172,10 +172,12 @@ def scrape_recipe_details(category: str, recipe_name: str, recipe_url: str):
 
             if detail_content is not None:
                 if detail_name == 'courses':
+                    # TODO clean whitespace from parsed courses
                     courses_list = detail_content.text.split(',')
                     return courses_list
 
                 elif detail_name == 'ingredients':
+                    # TODO clean whitespace from parsed ingredients
                     ingredient_names = [ingredient_name.find("span", class_="wprm-recipe-ingredient-name").text
                                         for ingredient_name in detail_content]
 
@@ -214,8 +216,8 @@ def scrape_recipe_details(category: str, recipe_name: str, recipe_url: str):
 
         return recipe_content
 
-    recipes[category]['Recipes'][recipe_name].update({'Content': get_all_details()})
-    save_data_to_json(recipes, 'all_recipes.json')
+    recipes[category]['recipes'][recipe_name].update({'content': get_all_details()})
+    save_data_to_json(recipes, 'json_files/all_recipes.json')
 
 
 def scrape_details_from_all_recipes():
@@ -224,11 +226,11 @@ def scrape_details_from_all_recipes():
     Used tqdm for displaying progress bar in console
     """
     for category, category_values in tqdm(recipes.items(), desc="Scraping recipes details from all categories: "):
-        category_recipes = category_values["Recipes"]
+        category_recipes = category_values["recipes"]
 
         for recipe_name, recipe_values in tqdm(category_recipes.items(),
                                                desc=f'Scraping recipe details from {category}'):
             scrape_recipe_details(category, recipe_name, recipe_values['url'])
 
             # Preventing overload server with requests
-            time.sleep(2)
+            time.sleep(1)
