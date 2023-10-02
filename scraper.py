@@ -172,16 +172,16 @@ def scrape_recipe_details(category: str, recipe_name: str, recipe_url: str):
 
             if detail_content is not None:
                 if detail_name == 'courses':
-                    # TODO clean whitespace from parsed courses
-                    courses_list = detail_content.text.split(',')
+                    courses_list = [course.strip() for course in detail_content.text.split(',')]
+                    [course.strip() for course in courses_list]
                     return courses_list
 
                 elif detail_name == 'ingredients':
-                    # TODO clean whitespace from parsed ingredients
                     ingredient_names = [ingredient_name.find("span", class_="wprm-recipe-ingredient-name").text
                                         for ingredient_name in detail_content]
 
-                    ingredient_amounts = [ingredient_amount.find("span").text for ingredient_amount in detail_content]
+                    ingredient_amounts = [ingredient_amount.find("span").text.strip()
+                                          for ingredient_amount in detail_content]
                     ingredients_dict = {}
 
                     for ingredient_name, amount in zip(ingredient_names, ingredient_amounts):
