@@ -38,7 +38,7 @@ def scrape_category_urls() -> dict:
                 category_urls[category_name] = {'url': category_url}
 
         print(f'Scraped titles and URL`s to {len(category_urls)} categories \n')
-        save_data_to_json(category_urls, 'json_files/category_urls.json')
+        save_data_to_json(category_urls, '../json_files/category_urls.json')
         return category_urls
 
 
@@ -98,10 +98,10 @@ def scrape_recipes_urls(category_name: str, category_url: str, recipes_data: dic
             return recipes_from_first_page
         else:
             recipes_data[category_name].update({'recipes': category_recipes})
-            save_data_to_json(recipes_data, 'json_files/rec.json')
+            save_data_to_json(recipes_data, '../json_files/rec.json')
             return recipes_data
 
-    save_data_to_json(recipes_data, 'json_files/recipes_urls.json')
+    save_data_to_json(recipes_data, '../json_files/recipes_urls.json')
 
 
 # Function scraping all recipes from provided category dictionary
@@ -227,7 +227,7 @@ def scrape_recipe_details(category: str, recipe_name: str, recipe_url: str, reci
 
         return recipe_content
     recipes_data[category]['recipes'][recipe_name].update({'content': get_all_details()})
-    save_data_to_json(recipes_data, 'json_files/all_recipes.json')
+    save_data_to_json(recipes_data, '../json_files/all_recipes.json')
 
 
 def scrape_details_from_all_recipes(recipes_urls: dict):
