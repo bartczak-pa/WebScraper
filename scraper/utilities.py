@@ -21,14 +21,14 @@ def delete_recipes_without_ingredients(recipes_input_data: dict):
                 if recipe_data["content"].get("ingredients") is None:
                     found_recipes_list.append((category, recipe_name))
                     recipes_without_ingredients[category] = {'recipes': {recipe_name: recipe_data}}
-                    save_data_to_json(recipes_without_ingredients, 'json_files/recipes_without_ingredients.json')
+                    save_data_to_json(recipes_without_ingredients, '../json_files/recipes_without_ingredients.json')
         print(f'Found {len(found_recipes_list)} recipes without ingredients.')
         return found_recipes_list
 
     for cat, recipe_to_delete in find_recipes_without_ingredients(recipes_input_data):
         del recipes_input_data[cat]["recipes"][recipe_to_delete]
 
-    save_data_to_json(recipes_input_data, 'json_files/recipes_with_ingredients.json')
+    save_data_to_json(recipes_input_data, '../json_files/recipes_with_ingredients.json')
 
 
 def check_new_recipes(data: dict) -> dict:
