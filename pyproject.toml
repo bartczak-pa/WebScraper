@@ -23,6 +23,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["ALL"]
+ignore  = ["ANN101", ]
 
 [tool.ruff.format]
 quote-style = "double"
