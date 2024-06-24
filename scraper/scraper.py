@@ -90,3 +90,28 @@ class Scraper:
     def sleep_for_random_time() -> None:
         """Sleep for random time between 1 and 10 seconds."""
         time.sleep(random.randint(1, 10))  # noqa: S311
+
+    @staticmethod
+    def parse_recipes_urls(category_name: str, category_url: str, pages_amount: int) -> dict:
+        """Return recipes titles and URL`s from one category."""
+        # Loop iterating through all category pages. Use tqdm for displaying inner progress bar in console.
+        recipes: dict = {}
+        for page_number in tqdm(range(1, pages_amount + 1), desc=f"Scraping recipes from {category_name}", position=1,
+                                leave=False):
+            r = requests.get(f"{category_url}page/{page_number}", timeout=10)
+            soup = BeautifulSoup(str(r.content), "html.parser")
+
+            recipe_container = soup.find("div", class_="custom-category-page-wrapper")
+            found_recipes = recipe_container.findAll("article")
+
+            recipes_urls: list = [link.find("a").get("href") for link in found_recipes]
+            recipes_titles: list = [link.find("a").text for link in found_recipes]
+            # TODO @Pawel: Add recipes images   # noqa: FIX002, TD003
+
+            for title, recipe_url in zip(recipes_titles, recipes_urls, strict=False):
+                recipes[title] = {"category": category_name, "url": recipe_url}
+
+            if pages_amount > 1:
+                Scraper.sleep_for_random_time()
+
+        return recipes
