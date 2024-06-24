@@ -54,3 +54,30 @@ class Scraper:
                         category_url: str = category_links[0].find("a").get("href")
                         category_urls[category_name] = {"url": category_url}
             return category_urls
+
+    @staticmethod
+    def check_number_of_pages(category_url: str) -> int:
+        """Return  amount of pages containing recipes from category."""
+        try:
+            r = requests.get(category_url, timeout=10)
+            r.raise_for_status()
+
+        except requests.exceptions.ConnectionError as err:
+            message: str = "Connection error occurred."
+            raise ConnectionError(message) from err
+        except requests.exceptions.HTTPError as err:
+            message: str = "HTTP error occurred."
+            raise HTTPError(message) from err
+        except Exception as err:
+            message: str = "Unexpected error occurred: " + str(err)
+            raise UnknownError(message) from err
+        else:
+            pages_num_soup = BeautifulSoup(r.content, "html.parser")
+            try:
+                pages = int(
+                    str(pages_num_soup.find("li", class_="pagination-next").
+                        find_previous("li").
+                        find("a").contents[1]).strip())
+            except AttributeError:
+                pages = 1
+            return pages
