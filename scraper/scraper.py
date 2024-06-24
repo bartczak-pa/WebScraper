@@ -115,3 +115,111 @@ class Scraper:
                 Scraper.sleep_for_random_time()
 
         return recipes
+
+
+    def parse_recipe_details(self: "Scraper", recipe_url: str) -> dict:  # noqa: C901
+        """Return recipe details such as ingredients, steps or cooking time."""
+        details_info: dict = {
+            "cook_time": {
+                "element": "span",
+                "classes": ["wprm-recipe-cook_time-minutes", "wprm-recipe-cook_time-hours"],
+            },
+
+            "prep_time": {
+                "element": "span",
+                "classes": ["wprm-recipe-details-minutes", "wprm-recipe-details-hours"],
+            },
+
+            "total_time": {
+                "element": "span",
+                "classes": ["wprm-recipe-total_time-minutes", "wprm-recipe-total_time-hours"],
+            },
+
+            "courses": {
+                "element": "span",
+                "classes": ["wprm-recipe-course"],
+            },
+
+            "cuisine": {
+                "element": "span",
+                "classes": ["wprm-recipe-cuisine"],
+            },
+
+            "servings": {
+                "element": "span",
+                "classes": ["wprm-recipe-servings"],
+            },
+
+            "calories": {
+                "element": "span",
+                "classes": ["wprm-recipe-calories"],
+            },
+
+            "ingredients": {
+                "element": "ul",
+                "classes": ["wprm-recipe-ingredients"],
+            },
+
+            "instructions": {
+                "element": "ul",
+                "classes": ["wprm-recipe-instructions"],
+            },
+
+        }
+        recipe_content = {}
+
+        r = requests.get(recipe_url, timeout=10, headers=self.headers)
+        soup = BeautifulSoup(r.content, "html.parser")
+        recipe_container = soup.find("div", class_="wprm-recipe-container")
+
+        def get_detail(detail_name: str, html_element: str, html_class: str) -> list[str] | dict | str | None:
+            """Return and process single recipe detail."""
+            if recipe_container is not None:
+                detail_content = recipe_container.find(html_element, html_class)
+
+                if detail_content is not None:
+                    if detail_name == "courses":
+                        courses_list = [course.strip() for course in detail_content.text.split(",")]
+                        [course.strip() for course in courses_list]
+                        return courses_list
+
+                    if detail_name == "ingredients":
+                        ingredient_names: list = [
+                            ingredient_name.find("span", class_="wprm-recipe-ingredient-name").text
+                            for ingredient_name in detail_content]
+
+                        ingredient_amounts: list = [ingredient_amount.find("span").text.strip()
+                                                    for ingredient_amount in detail_content]
+                        ingredients: dict = {}
+
+                        for ingredient_name, amount in zip(ingredient_names, ingredient_amounts, strict=False):
+                            ingredients[ingredient_name] = amount
+                        return ingredients
+
+                    if detail_name == "instructions":
+                        instructions: list = [step.text for step in detail_content]
+                        return instructions
+
+                    return detail_content.text
+            return None
+
+        def get_all_details() -> dict:
+            """Return all recipe details."""
+
+            def assign_values(class_order_number: int) -> None:
+                recipe_content[detail_name] = (
+                    get_detail(detail_name, detail_values["element"], detail_values["classes"][class_order_number]))
+
+            """
+            Some of the recipes have saved times in <span> elements with different classes (minutes/hours).
+            This condition is checking other classes from dictionary in case if script
+            will not be able to scrape primary class
+            """
+            for detail_name, detail_values in details_info.items():
+                assign_values(0)
+                if recipe_content[detail_name] is None and len(detail_values["classes"]) > 1:
+                    assign_values(1)
+
+            return recipe_content
+
+        return {"content": get_all_details()}
