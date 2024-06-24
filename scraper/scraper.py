@@ -1,7 +1,11 @@
 """Module containing functions for scraping recipes from Bianca Zapatka website."""
+import random
+import time
+
 import requests
 from bs4 import BeautifulSoup
 from requests import HTTPError
+from tqdm import tqdm
 
 from scraper.error_handling import CategoriesDivNotFoundError, UnknownError
 
@@ -81,3 +85,8 @@ class Scraper:
             except AttributeError:
                 pages = 1
             return pages
+
+    @staticmethod
+    def sleep_for_random_time() -> None:
+        """Sleep for random time between 1 and 10 seconds."""
+        time.sleep(random.randint(1, 10))  # noqa: S311
