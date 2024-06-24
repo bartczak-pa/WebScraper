@@ -59,11 +59,10 @@ class Scraper:
                         category_urls[category_name] = {"url": category_url}
             return category_urls
 
-    @staticmethod
-    def check_number_of_pages(category_url: str) -> int:
+    def check_number_of_pages(self: "Scraper", category_url: str) -> int:
         """Return  amount of pages containing recipes from category."""
         try:
-            r = requests.get(category_url, timeout=10)
+            r = requests.get(category_url, timeout=10, headers=self.headers)
             r.raise_for_status()
 
         except requests.exceptions.ConnectionError as err:
@@ -91,14 +90,13 @@ class Scraper:
         """Sleep for random time between 1 and 10 seconds."""
         time.sleep(random.randint(1, 10))  # noqa: S311
 
-    @staticmethod
-    def parse_recipes_urls(category_name: str, category_url: str, pages_amount: int) -> dict:
+    def parse_recipes_urls(self: "Scraper", category_name: str, category_url: str, pages_amount: int) -> dict:
         """Return recipes titles and URL`s from one category."""
         # Loop iterating through all category pages. Use tqdm for displaying inner progress bar in console.
         recipes: dict = {}
         for page_number in tqdm(range(1, pages_amount + 1), desc=f"Scraping recipes from {category_name}", position=1,
                                 leave=False):
-            r = requests.get(f"{category_url}page/{page_number}", timeout=10)
+            r = requests.get(f"{category_url}page/{page_number}", timeout=10, headers=self.headers)
             soup = BeautifulSoup(str(r.content), "html.parser")
 
             recipe_container = soup.find("div", class_="custom-category-page-wrapper")
@@ -115,7 +113,6 @@ class Scraper:
                 Scraper.sleep_for_random_time()
 
         return recipes
-
 
     def parse_recipe_details(self: "Scraper", recipe_url: str) -> dict:  # noqa: C901
         """Return recipe details such as ingredients, steps or cooking time."""
