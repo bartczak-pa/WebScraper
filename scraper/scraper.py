@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from requests import HTTPError
 from tqdm import tqdm
 
-from scraper.error_handling import CategoriesDivNotFoundError, UnknownError
+from utilities.error_handling import CategoriesDivNotFoundError, UnknownError
 
 
 class Scraper:
@@ -107,7 +107,7 @@ class Scraper:
 
             recipes_urls: list = [link.find("a").get("href") for link in found_recipes]
             recipes_titles: list = [link.find("a").text for link in found_recipes]
-            # TODO @Pawel: Add recipes images   # noqa: FIX002, TD003
+            # TODO @Pawel: Add code parsing recipes images
 
             for title, recipe_url in zip(recipes_titles, recipes_urls, strict=False):
                 recipes[title] = {"category": category_name, "url": recipe_url}
@@ -116,17 +116,6 @@ class Scraper:
                 Scraper.sleep_for_random_time()
 
         return recipes
-
-    def parse_all_recipes_urls(self: "Scraper") -> dict:
-        """Return all recipes titles and URL`s from all categories."""
-        for category, values in tqdm(self.categories.copy().items(),
-                                     desc="Scraping recipe URL`s from all categories: ", position=0):
-            category_name = category
-            category_url = values["url"]
-            pages_amount = self.check_number_of_pages(category_url)
-            self.recipes.update(self.parse_recipes_urls(category_name, category_url, pages_amount))
-
-        return self.recipes
 
     def parse_recipe_details(self: "Scraper", recipe_url: str) -> dict:  # noqa: C901
         """Return recipe details such as ingredients, steps or cooking time."""
@@ -234,3 +223,14 @@ class Scraper:
             return recipe_content
 
         return get_all_details()
+
+    def parse_all_recipes_urls(self: "Scraper") -> dict:
+        """Return all recipes titles and URL`s from all categories."""
+        for category, values in tqdm(self.categories.copy().items(),
+                                     desc="Scraping recipe URL`s from all categories: ", position=0):
+            category_name = category
+            category_url = values["url"]
+            pages_amount = self.check_number_of_pages(category_url)
+            self.recipes.update(self.parse_recipes_urls(category_name, category_url, pages_amount))
+
+        return self.recipes
