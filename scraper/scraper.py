@@ -219,4 +219,4 @@ class Scraper:
 
             return recipe_content
 
-        return {"content": get_all_details()}
+        return get_all_details()
