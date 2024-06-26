@@ -1,4 +1,5 @@
 """Module containing functions for scraping recipes from Bianca Zapatka website."""
+import json
 import random
 import time
 
@@ -16,6 +17,7 @@ class Scraper:
     def __init__(self: classmethod) -> None:
         """Initialize a scraper with base URL, headers, and empty dictionary for recipes."""
         self.PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
+        self.categories: dict = {}
         self.recipes: dict = {}
         self.headers: dict = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
@@ -57,6 +59,8 @@ class Scraper:
                     if category_links and category_name:
                         category_url: str = category_links[0].find("a").get("href")
                         category_urls[category_name] = {"url": category_url}
+
+            self.categories = category_urls
             return category_urls
 
     def check_number_of_pages(self: "Scraper", category_url: str) -> int:
@@ -113,6 +117,17 @@ class Scraper:
                 Scraper.sleep_for_random_time()
 
         return recipes
+
+    def parse_all_recipes_urls(self: "Scraper") -> dict:
+        """Return all recipes titles and URL`s from all categories."""
+        for category, values in tqdm(self.categories.copy().items(),
+                                     desc="Scraping recipe URL`s from all categories: ", position=0):
+            category_name = category
+            category_url = values["url"]
+            pages_amount = self.check_number_of_pages(category_url)
+            self.recipes.update(self.parse_recipes_urls(category_name, category_url, pages_amount))
+
+        return self.recipes
 
     def parse_recipe_details(self: "Scraper", recipe_url: str) -> dict:  # noqa: C901
         """Return recipe details such as ingredients, steps or cooking time."""
