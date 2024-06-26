@@ -1,5 +1,4 @@
 """Module containing functions for scraping recipes from Bianca Zapatka website."""
-import json
 import random
 import time
 
@@ -8,7 +7,7 @@ from bs4 import BeautifulSoup
 from requests import HTTPError
 from tqdm import tqdm
 
-from .error_handling import CategoriesDivNotFoundError, UnknownError
+from scraper.error_handling import CategoriesDivNotFoundError, UnknownError
 
 
 class Scraper:
@@ -235,18 +234,3 @@ class Scraper:
             return recipe_content
 
         return get_all_details()
-
-    def parse_all_recipes_details(self: "Scraper") -> None:
-        """Return all recipes details."""
-        for recipe, recipe_data in tqdm(self.recipes.copy().items(),
-                                        desc="Scraping recipes details from all recipes: "):
-            self.recipes[recipe]["content"] = self.parse_recipe_details(recipe_data["url"])
-            self.sleep_for_random_time()
-
-        with open("all_recipes_details.json", "w") as file:
-            json.dump(self.recipes, file, indent=4)
-
-
-
-
-
