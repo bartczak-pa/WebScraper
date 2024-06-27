@@ -14,9 +14,13 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 COPY scraper ./scraper
+COPY main.py ./
+COPY utilities ./utilities
+COPY json_files ./json_files
+
 
 RUN poetry install --without dev
 
-ENTRYPOINT ["poetry", "run", "python", "-m", "scraper.main"]
+ENTRYPOINT ["poetry", "run", "python", "-m", "main"]
 
 
