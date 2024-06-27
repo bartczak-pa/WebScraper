@@ -11,11 +11,19 @@ This web scraper is designed to extract recipes from the [Bianca Zapatka Blog](h
 
 The app task is to scrape recipes from Culinary Blog and save them to JSON file. 
 
-### Used libraries
+### Used libraries and 3rd party apps
 
 **Beautiful Soup 4** - Well known web scraper which allows parse HTML files and extract desired data.
 
 **tqdm** - Python library responsible for displaying progress bars
+
+**Poetry** - For managing dependencies and build virtual environment
+
+**Ruff** - Well known linter for Python
+
+**Pytest** - For testing the app
+
+**Docker** - For containerizing the app
 
 ## Features
 
@@ -28,8 +36,8 @@ The app task is to scrape recipes from Culinary Blog and save them to JSON file.
 
 Make sure you have the following installed on your system:
 
-- Python (version 3.x)
-- Virtualenv (install using `pip install virtualenv`)
+- Python (version 3.12)
+- Docker
 
 ## Usage
 
@@ -39,11 +47,10 @@ Make sure you have the following installed on your system:
    - Type `git clone https://github.com/bartczak-pa/WebScraper.git`
    - Press Enter to create your local clone.
 
-2. Create and activate a virtual environment:
-   - Create virtual environment (type `python3 -m venv env`)
-   - Activate virtual environment (type `source env/bin/activate'`)
-   - Open app directory (type `cd WebScraper'`)
-   - Install dependencies (type `python3 -m pip install -r requirements.txt'`)
+2. Create Docker Image
+   - Open Terminal.
+   - Change the current working directory to the location of the cloned repository.
+   - Type `docker build -t webscraper .`
 
 3. Activate Script
-   - Activate script by typing `python main.py`
+   - Activate script by typing `docker run -d webscraper`
