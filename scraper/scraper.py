@@ -14,7 +14,6 @@ class Scraper:
     """Class containing methods for scraping recipes from Bianca Zapatka website."""
 
     def __init__(self: classmethod) -> None:
-        """Initialize a scraper with base URL, headers, and empty dictionary for recipes."""
         self.PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
         self.categories: dict = {}
         self.recipes: dict = {}
