@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass, field
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, ResultSet
 from requests import HTTPError
 from tqdm import tqdm
 
@@ -26,6 +26,13 @@ class Scraper:
         """Return category names and their URLs."""
         category_urls: dict[str, dict[str, str]] = {}
 
+        def check_if_content_exists(container: ResultSet) -> None:
+            """Check if content exists in container."""
+            try:
+                container[1]
+            except IndexError as error:
+                raise CategoriesDivNotFoundError from error
+
         try:
             r = requests.get(self.PAGE_URL, timeout=10, headers=self.headers)
             r.raise_for_status()
@@ -43,21 +50,15 @@ class Scraper:
         else:
             soup = BeautifulSoup(r.content, "html.parser")
             categories_div_content = soup.find_all("section", class_="featuredpost")
+            check_if_content_exists(categories_div_content)
 
-            try:
-                # This makes sure that container with categories is found
-                categories_div_content[1]
-            except IndexError as err:
-                raise CategoriesDivNotFoundError from err
+            for category in categories_div_content:
+                category_name: str = category.find("h3").text
+                category_links: list = category.find_all("p", class_="more-from-category")
 
-            else:
-                for category in categories_div_content:
-                    category_name: str = category.find("h3").text
-                    category_links: list = category.find_all("p", class_="more-from-category")
-
-                    if category_links and category_name:
-                        category_url: str = category_links[0].find("a").get("href")
-                        category_urls[category_name] = {"url": category_url}
+                if category_links and category_name:
+                    category_url: str = category_links[0].find("a").get("href")
+                    category_urls[category_name] = {"url": category_url}
 
             self.categories = category_urls
             return category_urls
@@ -234,3 +235,4 @@ class Scraper:
             self.recipes.update(self.parse_recipes_urls(category_name, category_url, pages_amount))
 
         return self.recipes
+
