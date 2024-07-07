@@ -62,6 +62,15 @@ class Scraper:
             self.categories = category_urls
             return category_urls
 
+    def get_pages(self, content: BeautifulSoup) -> int:
+        """Return amount of pages from container."""
+        try:
+            pages = int(
+                str(content.find("li", class_="pagination-next").find_previous("li").find("a").contents[1]).strip())
+        except AttributeError:
+            pages = 1
+        return pages
+
     def check_number_of_pages(self, category_url: str) -> int:
         """Return amount of pages containing recipes from category."""
         try:
@@ -78,15 +87,7 @@ class Scraper:
             message: str = "Unexpected error occurred: " + str(err)
             raise UnknownError(message) from err
         else:
-            pages_num_soup = BeautifulSoup(r.content, "html.parser")
-            try:
-                pages = int(
-                    str(pages_num_soup.find("li", class_="pagination-next").
-                        find_previous("li").
-                        find("a").contents[1]).strip())
-            except AttributeError:
-                pages = 1
-            return pages
+            return self.get_pages(BeautifulSoup(r.content, "html.parser"))
 
     @staticmethod
     def sleep_for_random_time() -> None:
