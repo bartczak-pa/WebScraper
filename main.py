@@ -1,10 +1,12 @@
 """A script to run the scraper."""
 
 from scraper.scraper import Scraper
+from scraper.updates_scraper import UpdatesScraper
 
 if __name__ == "__main__":
-    """Initialisation of main scraper."""
-    scraper = Scraper()
+    """Initialisation of main and updates scrapers."""
+    scraper = Scraper(categories={}, recipes={})
+    updates_scraper = UpdatesScraper()
 
 
 

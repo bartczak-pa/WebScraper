@@ -1,6 +1,5 @@
 """Helper functions for file processing."""
 
-
 import json
 from pathlib import Path
 
