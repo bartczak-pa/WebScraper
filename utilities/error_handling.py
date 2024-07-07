@@ -4,7 +4,7 @@
 class CategoriesDivNotFoundError(Exception):
     """Exception raised when the categories div container is not found."""
 
-    def __init__(self: classmethod, message: str = "Categories div container has not been found") -> None:
+    def __init__(self, message: str = "Categories div container has not been found") -> None:
         self.message = message
         super().__init__(self.message)
 
@@ -12,7 +12,7 @@ class CategoriesDivNotFoundError(Exception):
 class RequestError(Exception):
     """Exception raised when there's an issue with request."""
 
-    def __init__(self: classmethod, message: str = "Request issue has occured:") -> None:
+    def __init__(self, message: str = "Request issue has occured:") -> None:
         self.message = message
         super().__init__(self.message)
 

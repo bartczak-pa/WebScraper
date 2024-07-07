@@ -13,7 +13,7 @@ from utilities.error_handling import CategoriesDivNotFoundError, UnknownError
 class Scraper:
     """Class containing methods for scraping recipes from Bianca Zapatka website."""
 
-    def __init__(self: classmethod) -> None:
+    def __init__(self) -> None:
         self.PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
         self.categories: dict = {}
         self.recipes: dict = {}
@@ -61,7 +61,7 @@ class Scraper:
             self.categories = category_urls
             return category_urls
 
-    def check_number_of_pages(self: "Scraper", category_url: str) -> int:
+    def check_number_of_pages(self, category_url: str) -> int:
         """Return  amount of pages containing recipes from category."""
         try:
             r = requests.get(category_url, timeout=10, headers=self.headers)
@@ -92,7 +92,7 @@ class Scraper:
         """Sleep for random time between 1 and 10 seconds."""
         time.sleep(random.randint(1, 10))  # noqa: S311
 
-    def parse_recipes_urls(self: "Scraper", category_name: str, category_url: str, pages_amount: int) -> dict:
+    def parse_recipes_urls(self, category_name: str, category_url: str, pages_amount: int) -> dict:
         """Return recipes titles and URL`s from one category."""
         # Loop iterating through all category pages. Use tqdm for displaying inner progress bar in console.
         recipes: dict = {}
@@ -116,7 +116,7 @@ class Scraper:
 
         return recipes
 
-    def parse_recipe_details(self: "Scraper", recipe_url: str) -> dict:  # noqa: C901
+    def parse_recipe_details(self, recipe_url: str) -> dict:  # noqa: C901
         """Return recipe details such as ingredients, steps or cooking time."""
         details_info: dict = {
             "cook_time": {
@@ -223,7 +223,7 @@ class Scraper:
 
         return get_all_details()
 
-    def parse_all_recipes_urls(self: "Scraper") -> dict:
+    def parse_all_recipes_urls(self) -> dict:
         """Return all recipes titles and URL`s from all categories."""
         for category, values in tqdm(self.categories.copy().items(),
                                      desc="Scraping recipe URL`s from all categories: ", position=0):
