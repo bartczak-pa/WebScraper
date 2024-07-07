@@ -1,6 +1,7 @@
 """Module containing functions for scraping recipes from Bianca Zapatka website."""
 import random
 import time
+from dataclasses import dataclass, field
 
 import requests
 from bs4 import BeautifulSoup
@@ -10,16 +11,16 @@ from tqdm import tqdm
 from utilities.error_handling import CategoriesDivNotFoundError, UnknownError
 
 
+@dataclass
 class Scraper:
     """Class containing methods for scraping recipes from Bianca Zapatka website."""
 
-    def __init__(self) -> None:
-        self.PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
-        self.categories: dict = {}
-        self.recipes: dict = {}
-        self.headers: dict = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
-        }
+    categories: dict
+    recipes: dict
+    PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
+    headers: dict = field(default_factory=lambda: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
+    })
 
     def parse_category_urls(self) -> dict[str, dict[str, str]]:
         """Return category names and their URLs."""
@@ -62,7 +63,7 @@ class Scraper:
             return category_urls
 
     def check_number_of_pages(self, category_url: str) -> int:
-        """Return  amount of pages containing recipes from category."""
+        """Return amount of pages containing recipes from category."""
         try:
             r = requests.get(category_url, timeout=10, headers=self.headers)
             r.raise_for_status()
