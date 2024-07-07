@@ -45,7 +45,7 @@ class Scraper:
             categories_div_content = soup.find_all("section", class_="featuredpost")
 
             try:
-                # Try to access the second element in the list
+                # This makes sure that container with categories is found
                 categories_div_content[1]
             except IndexError as err:
                 raise CategoriesDivNotFoundError from err
@@ -95,7 +95,6 @@ class Scraper:
 
     def parse_recipes_urls(self, category_name: str, category_url: str, pages_amount: int) -> dict:
         """Return recipes titles and URL`s from one category."""
-        # Loop iterating through all category pages. Use tqdm for displaying inner progress bar in console.
         recipes: dict = {}
         for page_number in tqdm(range(1, pages_amount + 1), desc=f"Scraping recipes from {category_name}", position=1,
                                 leave=False):
