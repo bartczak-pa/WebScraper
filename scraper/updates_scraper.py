@@ -48,3 +48,8 @@ class UpdatesScraper(Scraper):
                 message = "No new recipes have been found."
         # TODO (Pawel): Replace printing with logging
         print(message)  # noqa: T201
+
+    def check_new_recipes_from_all_categories(self) -> None:
+        """Check for new recipes in all categories and saves them in dictionary of existing recipes."""
+        for category, values in self.existing_categories.items():
+            self.check_new_recipes_from_category(category, values["url"])
