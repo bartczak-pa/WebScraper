@@ -12,7 +12,7 @@ class CategoriesDivNotFoundError(Exception):
 class RequestError(Exception):
     """Exception raised when there's an issue with request."""
 
-    def __init__(self, message: str = "Request issue has occured:") -> None:
+    def __init__(self, message: str = "Request issue has occurred:") -> None:
         self.message = message
         super().__init__(self.message)
 
