@@ -40,4 +40,9 @@ async def display_amount_of_recipes_per_category() -> dict:
     return dict(Counter(categories))
 
 
-
+@app.get("/categories/{category_name}")
+async def display_category_recipes(category_name: str) -> dict:
+    """Return recipes from given category."""
+    recipes = decode_recipes()
+    return {recipe_name: details for recipe_name, details in recipes.items() if
+            details["category"].lower() == category_name.lower()}
