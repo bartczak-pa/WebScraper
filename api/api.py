@@ -28,8 +28,9 @@ async def display_amount_of_recipes_per_category() -> dict:
     try:
         with Path.open(check_if_recipes_exists()) as file:
             recipes = json.load(file)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Error reading JSON file")  # noqa: B904
+    except json.JSONDecodeError as err:
+        raise HTTPException(status_code=500, detail="Error reading JSON file") from err
     else:
         categories: list = [recipe_data["category"].lower() for recipe_data in recipes.values()]
         return Counter(categories)
+
