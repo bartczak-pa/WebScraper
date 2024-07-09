@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
-FILES_PATH = (Path("../json_files/"))
+RECIPES_FILE_PATH = (Path("../json_files/parsed_recipes.json"))
 
 
 @app.get("/")
@@ -13,12 +13,10 @@ def read_root() -> dict:
     return {"App": "Recipes API"}
 
 
-def check_if_file_exists(file_name: str) -> Path:
+def check_if_recipes_exists(recipes_file_path: Path) -> Path:
     """Check if file exists and return its path, otherwise raise an exception."""
-    file_path = FILES_PATH / file_name
-
-    if not Path.exists(file_path):
+    if not Path.exists(recipes_file_path):
         raise HTTPException(status_code=404, detail="File not found")
+    return recipes_file_path
 
-    return file_path
 
