@@ -25,7 +25,7 @@ class UpdatesScraper(Scraper):
             message = "No new categories have been found."
         elif len(new_categories) > len(self.existing_categories):
             message = "New categories have been found."
-            save_data_to_json(new_categories, "../json_files/categories.json")
+            save_data_to_json(new_categories, "/app/json_files/categories.json")
         return message
 
     def check_new_recipes_from_category(self, category_name: str, category_url: str) -> None:
@@ -43,7 +43,7 @@ class UpdatesScraper(Scraper):
                     "url": url,
                     "content": self.parse_recipe_details(url),
                 }
-                save_data_to_json(self.existing_recipes, "../json_files/parsed_recipes.json")
+                save_data_to_json(self.existing_recipes, "/app/json_files/parsed_recipes.json")
             else:
                 message = "No new recipes have been found."
         # TODO (Pawel): Replace printing with logging
