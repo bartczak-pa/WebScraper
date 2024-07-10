@@ -15,8 +15,13 @@ RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 COPY scraper ./scraper
 
+COPY utilities ./utilities
+COPY json_files ./json_files
+
+copy main.py ./
+
 RUN poetry install --without dev
 
-ENTRYPOINT ["poetry", "run", "python", "-m", "scraper.main"]
+ENTRYPOINT ["poetry", "run", "python", "/app/main.py"]
 
 
