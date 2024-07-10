@@ -40,4 +40,3 @@ Make sure you have the following installed on your system:
     - Run `docker build -t web-scraper .`
 3. Run Docker Container:
     - Run `docker run -p 8000:8000 web-scraper`
-   - Activate script by typing `python main.py`

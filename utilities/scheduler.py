@@ -1,19 +1,27 @@
-import sched
+"""Module responsible for scheduling updates."""
 import time
+from dataclasses import dataclass
+
+import schedule
 
 from scraper.updates_scraper import UpdatesScraper
 
-recipe_updater = sched.scheduler(time.time, time.sleep)
 
+@dataclass
+class Scheduler:
+    """Class responsible for scheduling updates."""
 
-def check_updates() -> None:
-    """Run the update function every 24 hours."""
     scraper = UpdatesScraper()
-    scraper.check_new_categories()
-    scraper.check_new_recipes_from_all_categories()
-    recipe_updater.enter(86400, 1, check_updates)
-    print("Scraper run complete. Scheduling next run in 24 hours.")  # noqa: T201
 
+    def check_updates(self) -> None:
+        """Check for updates in categories and recipes."""
+        self.scraper.check_new_categories()
+        self.scraper.check_new_recipes_from_all_categories()
 
-recipe_updater.enter(0, 1, check_updates)
-recipe_updater.run()
+    def run(self) -> None:
+        """Run the scheduler."""
+        schedule.every(24).hours.do(self.check_updates)
+
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
