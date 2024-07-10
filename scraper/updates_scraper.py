@@ -13,8 +13,8 @@ class UpdatesScraper(Scraper):
 
     def __init__(self) -> None:
         super().__init__({}, {})
-        self.existing_categories: dict = load_data(Path("../json_files/categories.json"))
-        self.existing_recipes: dict = load_data(Path("../json_files/parsed_recipes.json"))
+        self.existing_categories: dict = load_data(Path("/app/json_files/categories.json"))
+        self.existing_recipes: dict = load_data(Path("/app/json_files/parsed_recipes.json"))
 
     def check_new_categories(self) -> str:
         """Check for new categories and compare them with dictionary of existing categories."""
