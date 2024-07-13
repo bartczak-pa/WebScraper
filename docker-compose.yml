@@ -3,14 +3,14 @@ services:
   scraper:
     build:
       context: .
-      dockerfile: Dockerfile.scraper
+      dockerfile: scraper/Dockerfile
     volumes:
       - json_files:/app/json_files
 
   api:
     build:
       context: .
-      dockerfile: Dockerfile.api
+      dockerfile: api/Dockerfile
     volumes:
       - json_files:/app/json_files
     ports:
