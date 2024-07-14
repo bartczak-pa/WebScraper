@@ -27,16 +27,27 @@ The app task is to scrape recipes from Culinary Blog and save them to JSON file.
 - Saves extracted data to JSON file for further processing
 - Serves the extracted data via FastAPI
 
-## Prerequisites
+## Planned features
+
+- Sending Slack / email notification when the new recipes are found 
+- Adding nutrition information to the recipes using external API 
+
+## Demo
+
+- [API endpoint](https://pink-sheep4827.byst.re/)
+- [API documentation](https://pink-sheep4827.byst.re/docs)
+
+- ## Prerequisites
 
 Make sure you have the following installed on your system:
 
 - Docker
+- Docker compose
 
 ## Usage
 
 1. Clone the repository
-2. Build Docker Image:
-    - Run `docker build -t web-scraper .`
-3. Run Docker Container:
-    - Run `docker run -p 8000:8000 web-scraper`
+2. Build the stack
+    - Run `docker-compose build`
+3. Run the stack 
+    - Run `docker-compose up`
