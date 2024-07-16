@@ -17,33 +17,37 @@ The app task is to scrape recipes from Culinary Blog and save them to JSON file.
 
 **tqdm** - Python library responsible for displaying progress bars
 
+**FastAPI** - Modern, fast (high-performance), web framework for building APIs based on standard Python type hints.
+
 ## Features
 
 - Fetches recipes content from a [Bianca Zapatka blog](https://biancazapatka.com/)
 - Parses the HTML using Beautiful Soup
 - Extracts data based on specified CSS selectors
 - Saves extracted data to JSON file for further processing
+- Serves the extracted data via FastAPI
 
-## Prerequisites
+## Planned features
+
+- Sending Slack / email notification when the new recipes are found 
+- Adding nutrition information to the recipes using external API 
+
+## Demo
+
+- [API endpoint](https://pink-sheep4827.byst.re/)
+- [API documentation](https://pink-sheep4827.byst.re/docs)
+
+- ## Prerequisites
 
 Make sure you have the following installed on your system:
 
-- Python (version 3.x)
-- Virtualenv (install using `pip install virtualenv`)
+- Docker
+- Docker compose
 
 ## Usage
 
-1. Clone the repository:
-   - Open Terminal.
-   - Change the current working directory to the location where you want the cloned directory.
-   - Type `git clone https://github.com/bartczak-pa/WebScraper.git`
-   - Press Enter to create your local clone.
-
-2. Create and activate a virtual environment:
-   - Create virtual environment (type `python3 -m venv env`)
-   - Activate virtual environment (type `source env/bin/activate'`)
-   - Open app directory (type `cd WebScraper'`)
-   - Install dependencies (type `python3 -m pip install -r requirements.txt'`)
-
-3. Activate Script
-   - Activate script by typing `python main.py`
+1. Clone the repository
+2. Build the stack
+    - Run `docker-compose build`
+3. Run the stack 
+    - Run `docker-compose up`
