@@ -191,10 +191,8 @@ class Scraper:
 
                         ingredient_amounts: list = [ingredient_amount.find("span").text.strip()
                                                     for ingredient_amount in detail_content]
-                        ingredients: dict = {}
 
-                        for ingredient_name, amount in zip(ingredient_names, ingredient_amounts, strict=False):
-                            ingredients[ingredient_name] = amount
+                        ingredients: dict = dict(zip(ingredient_names, ingredient_amounts, strict=False))
                         return ingredients
 
                     if detail_name == "instructions":

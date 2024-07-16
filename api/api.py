@@ -45,7 +45,9 @@ def read_root() -> dict:
 async def display_amount_of_recipes_per_category() -> dict:
     """Return amount of recipes from each normalized category."""
     recipes = decode_recipes()
-    normalized_categories = [normalize_category_name(recipe_data["category"].lower()) for recipe_data in recipes.values()]
+    normalized_categories = [normalize_category_name(recipe_data["category"].lower())
+                             for recipe_data in recipes.values()
+                             ]
     return dict(Counter(normalized_categories))
 
 
