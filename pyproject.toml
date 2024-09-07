@@ -2,7 +2,7 @@
 name = "Webscraper"
 version = "0.1.0"
 description = "My first webscraper parsing recipes from Bianca Zapatka website"
-authors = ["Pawel Bartczak pawel@bartczak.tech"]
+authors = ["Pawel Bartczak <pawel@bartczak.tech>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
