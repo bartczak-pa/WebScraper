@@ -44,7 +44,7 @@ class Scraper:
             message: str = "HTTP error occurred."
             raise HTTPError(message) from err
         except Exception as err:
-            message: str = f"Unexpected error occurred: {str(err)}"
+            message: str = f"Unexpected error occurred: {err}"
             raise UnknownError(message) from err
 
         else:
@@ -85,7 +85,7 @@ class Scraper:
             message: str = "HTTP error occurred."
             raise HTTPError(message) from err
         except Exception as err:
-            message: str = f"Unexpected error occurred: {str(err)}"
+            message: str = f"Unexpected error occurred: {err}"
             raise UnknownError(message) from err
         else:
             return self.get_pages(BeautifulSoup(r.content, "html.parser"))
