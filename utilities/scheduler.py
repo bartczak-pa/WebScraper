@@ -8,10 +8,11 @@ from scraper.updates_scraper import UpdatesScraper
 
 
 @dataclass
-class Scheduler:
+class UpdatesScheduler:
     """Class responsible for scheduling updates."""
 
-    scraper = UpdatesScraper()
+    def __init__(self) -> None:
+        self.scraper = UpdatesScraper()
 
     def check_updates(self) -> None:
         """Check for updates in categories and recipes."""
@@ -20,6 +21,7 @@ class Scheduler:
 
     def run(self) -> None:
         """Run the scheduler."""
+        self.check_updates()
         schedule.every(24).hours.do(self.check_updates)
 
         while True:
