@@ -41,6 +41,8 @@ class UpdatesScraper(Scraper):
         else:
             logging.info("No new categories have been found.")
 
+        logging.info("Categories updates completed. Proceeding to check for new recipes.")
+
     def check_new_recipes_from_category(self, category_name: str, category_url: str) -> None:
         """Check for new recipes in a given category and saves them to the dictionary of existing recipes."""
         new_recipes: dict = self.parse_recipes_urls(category_name, category_url, 1)
@@ -62,6 +64,8 @@ class UpdatesScraper(Scraper):
             save_data_to_json(self.existing_recipes, "/app/json_files/parsed_recipes.json")
         else:
             logging.info("No new recipes have been found in %s.", category_name)
+
+        logging.info("Recipes updates completed.")
 
 
     def check_new_recipes_from_all_categories(self) -> None:
