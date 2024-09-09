@@ -51,6 +51,7 @@ class UpdatesScraper(Scraper):
             if recipe not in self.existing_recipes
         }:
             logging.info("New recipes have been found in %s: %s", category_name, ", ".join(new_recipes_found.keys()))
+            # Update existing recipes with new ones
             for recipe, values in new_recipes_found.items():
                 url: str = values["url"]
                 self.existing_recipes[recipe] = {
