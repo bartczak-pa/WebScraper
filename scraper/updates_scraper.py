@@ -45,20 +45,23 @@ class UpdatesScraper(Scraper):
         """Check for new recipes in a given category and saves them to the dictionary of existing recipes."""
         new_recipes: dict = self.parse_recipes_urls(category_name, category_url, 1)
 
-        for recipe, values in new_recipes.items():
-            if recipe not in self.existing_recipes:
-                logging.info("New recipe have been found in category: %s", category_name)
+        if new_recipes_found := {
+            recipe: values
+            for recipe, values in new_recipes.items()
+            if recipe not in self.existing_recipes
+        }:
+            logging.info("New recipes have been found in %s: %s", category_name, ", ".join(new_recipes_found.keys()))
+            for recipe, values in new_recipes_found.items():
                 url: str = values["url"]
-
-                self.existing_recipes[recipe]: dict = {
+                self.existing_recipes[recipe] = {
                     "category": category_name,
                     "url": url,
                     "content": self.parse_recipe_details(url),
                 }
-                save_data_to_json(self.existing_recipes, "/app/json_files/parsed_recipes.json")
-            else:
-                # TODO @Pawel: Implement logging only once, not in the loop
-                logging.info("No new recipes have been found in category: %s", category_name)
+            save_data_to_json(self.existing_recipes, "/app/json_files/parsed_recipes.json")
+        else:
+            logging.info("No new recipes have been found in %s.", category_name)
+
 
     def check_new_recipes_from_all_categories(self) -> None:
         """Check for new recipes in all categories and saves them in dictionary of existing recipes."""
