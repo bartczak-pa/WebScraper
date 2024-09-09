@@ -27,7 +27,6 @@ class UpdatesScraper(Scraper):
         super().__init__({}, {})
         self.existing_categories: dict = load_data(Path("/app/json_files/categories.json"))
         self.existing_recipes: dict = load_data(Path("/app/json_files/parsed_recipes.json"))
-        self.logged_categories: set = set()
 
     def check_new_categories(self) -> None:
         """Check for new categories and compare them with dictionary of existing categories."""
