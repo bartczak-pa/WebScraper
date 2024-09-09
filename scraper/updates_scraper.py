@@ -27,16 +27,20 @@ class UpdatesScraper(Scraper):
         super().__init__({}, {})
         self.existing_categories: dict = load_data(Path("/app/json_files/categories.json"))
         self.existing_recipes: dict = load_data(Path("/app/json_files/parsed_recipes.json"))
+        self.logged_categories: set = set()
 
     def check_new_categories(self) -> None:
         """Check for new categories and compare them with dictionary of existing categories."""
         new_categories: dict = self.parse_category_urls()
-
-        if len(self.existing_categories) == len(new_categories):
-            logging.info("No new categories have been found.")
-        elif len(new_categories) > len(self.existing_categories):
-            logging.info("New categories have been found.")
+        if new_categories_found := {
+            cat: new_categories[cat]
+            for cat in new_categories
+            if cat not in self.existing_categories
+        }:
+            logging.info("New categories have been found: %s", ", ".join(new_categories_found.keys()))
             save_data_to_json(new_categories, "/app/json_files/categories.json")
+        else:
+            logging.info("No new categories have been found.")
 
     def check_new_recipes_from_category(self, category_name: str, category_url: str) -> None:
         """Check for new recipes in a given category and saves them to the dictionary of existing recipes."""
