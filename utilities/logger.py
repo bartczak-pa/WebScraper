@@ -5,8 +5,8 @@ from pathlib import Path
 
 def setup_logging() -> None:
     """Set up logging configuration."""
-    log_file_path = Path("logs/web_scraper.log")  # Specify the log file path
-    log_file_path.parent.mkdir(parents=True, exist_ok=True)  # Create directory if it doesn't exist
+    log_file_path = Path("logs/web_scraper.log")
+    log_file_path.parent.mkdir(parents=True, exist_ok=True)
 
     logging.basicConfig(
         level=logging.INFO,
