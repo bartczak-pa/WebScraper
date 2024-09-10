@@ -1,4 +1,5 @@
 """Module responsible for scheduling updates."""
+import signal
 import time
 from dataclasses import dataclass
 
@@ -11,8 +12,12 @@ from scraper.updates_scraper import UpdatesScraper
 class UpdatesScheduler:
     """Class responsible for scheduling updates."""
 
+    scraper: UpdatesScraper
+    running: bool
+
     def __init__(self) -> None:
         self.scraper = UpdatesScraper()
+        self.running = True
 
     def check_updates(self) -> None:
         """Check for updates in categories and recipes."""
@@ -24,6 +29,12 @@ class UpdatesScheduler:
         self.check_updates()
         schedule.every(24).hours.do(self.check_updates)
 
+        def signal_handler(sig: int, frame: object) -> None:  # noqa: ARG001
+            self.running = False
+
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+
         while True:
             schedule.run_pending()
-            time.sleep(1)
+            time.sleep(10)

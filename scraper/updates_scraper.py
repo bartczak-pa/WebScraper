@@ -4,20 +4,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from utilities.file_processing import load_data, save_data_to_json
+from utilities.logger import setup_logging
 
 from .scraper import Scraper
 
-#Configure logging
-log_file_path = Path("logs/updates_scraper.log")
-log_file_path.parent.mkdir(parents=True, exist_ok=True)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler(log_file_path),
-        logging.StreamHandler(),
-    ],
-)
+setup_logging()
 
 @dataclass
 class UpdatesScraper(Scraper):
@@ -41,6 +32,8 @@ class UpdatesScraper(Scraper):
         else:
             logging.info("No new categories have been found.")
 
+        logging.info("Categories updates completed. Proceeding to check for new recipes.")
+
     def check_new_recipes_from_category(self, category_name: str, category_url: str) -> None:
         """Check for new recipes in a given category and saves them to the dictionary of existing recipes."""
         new_recipes: dict = self.parse_recipes_urls(category_name, category_url, 1)
@@ -60,11 +53,15 @@ class UpdatesScraper(Scraper):
                     "content": self.parse_recipe_details(url),
                 }
             save_data_to_json(self.existing_recipes, "/app/json_files/parsed_recipes.json")
+            logging.info("Recipes have been saved.")
         else:
             logging.info("No new recipes have been found in %s.", category_name)
+
 
 
     def check_new_recipes_from_all_categories(self) -> None:
         """Check for new recipes in all categories and saves them in dictionary of existing recipes."""
         for category, values in self.existing_categories.items():
             self.check_new_recipes_from_category(category, values["url"])
+
+        logging.info("Completed checking for new recipes in all categories.")
