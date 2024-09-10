@@ -45,11 +45,17 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         known_hosts: '${{ secrets.SSH_IP_ADDRESS }}:${{ secrets.SSH_PORT }}'
 
-    - name: Deploy to server
-      run: |
-        ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@y${{ secrets.SSH_IP_ADDRESS }} 
-        cd ${{ secrets.PATH_TO_PROJECT }} &&
-        docker pull ${{ secrets.DOCKER_USERNAME }}/WebScraper:latest &&
-        docker-compose down &&
-        docker-compose up -d
-        "
+    - name: SSH into server
+      run: ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_IP_ADDRESS }}
+
+    - name: Navigate to project directory
+      run: cd ${{ secrets.PATH_TO_PROJECT }}
+
+    - name: Pull latest Docker image
+      run: docker pull ${{ secrets.DOCKER_USERNAME }}/WebScraper:latest
+
+    - name: Stop running containers
+      run: docker-compose down
+
+    - name: Start updated containers
+      run: docker-compose up -d
