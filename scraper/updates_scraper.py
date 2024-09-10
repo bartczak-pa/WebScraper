@@ -4,20 +4,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from utilities.file_processing import load_data, save_data_to_json
+from utilities.logger import setup_logging
 
 from .scraper import Scraper
 
-#Configure logging
-log_file_path = Path("logs/updates_scraper.log")
-log_file_path.parent.mkdir(parents=True, exist_ok=True)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler(log_file_path),
-        logging.StreamHandler(),
-    ],
-)
+setup_logging()
 
 @dataclass
 class UpdatesScraper(Scraper):
