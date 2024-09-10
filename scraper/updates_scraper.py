@@ -53,6 +53,7 @@ class UpdatesScraper(Scraper):
                     "content": self.parse_recipe_details(url),
                 }
             save_data_to_json(self.existing_recipes, "/app/json_files/parsed_recipes.json")
+            logging.info("Recipes have been saved.")
         else:
             logging.info("No new recipes have been found in %s.", category_name)
 
