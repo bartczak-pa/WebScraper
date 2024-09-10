@@ -57,10 +57,11 @@ class UpdatesScraper(Scraper):
         else:
             logging.info("No new recipes have been found in %s.", category_name)
 
-        logging.info("Recipes updates completed.")
 
 
     def check_new_recipes_from_all_categories(self) -> None:
         """Check for new recipes in all categories and saves them in dictionary of existing recipes."""
         for category, values in self.existing_categories.items():
             self.check_new_recipes_from_category(category, values["url"])
+
+        logging.info("Completed checking for new recipes in all categories.")
