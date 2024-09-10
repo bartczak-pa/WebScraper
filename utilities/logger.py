@@ -1,4 +1,4 @@
-
+"""Logging configuration for the web scraper."""
 import logging
 from pathlib import Path
 
