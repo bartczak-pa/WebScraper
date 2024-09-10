@@ -1,4 +1,5 @@
 """Module responsible for scheduling updates."""
+import logging
 import signal
 import time
 from dataclasses import dataclass
@@ -23,6 +24,9 @@ class UpdatesScheduler:
         """Check for updates in categories and recipes."""
         self.scraper.check_new_categories()
         self.scraper.check_new_recipes_from_all_categories()
+
+        for handler in logging.getLogger().handlers:
+            handler.flush()
 
     def run(self) -> None:
         """Run the scheduler."""
