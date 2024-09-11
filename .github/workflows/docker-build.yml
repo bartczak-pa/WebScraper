@@ -22,11 +22,10 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v4
-      with:
-        push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/webscraper:latest
+    - name: Build and push Docker images
+      run: |
+        docker compose -f docker-compose.yml build
+        docker compose -f docker-compose.yml push
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,11 +50,11 @@ jobs:
     - name: Navigate to project directory
       run: cd ${{ secrets.PATH_TO_PROJECT }}
 
-    - name: Pull latest Docker image
-      run: docker pull ${{ secrets.DOCKER_USERNAME }}/webscraper:latest
+    - name: Pull latest Docker images
+      run: docker compose -f docker-compose.yml pull
 
     - name: Stop running containers
-      run: docker-compose down
+      run: docker compose -f docker-compose.yml down
 
     - name: Start updated containers
-      run: docker-compose up -d
+      run: docker compose -f docker-compose.yml up -d
