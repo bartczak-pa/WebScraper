@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   scraper:
+    image: bartczaktech/scraper:latest
     build:
       context: .
       dockerfile: scraper/Dockerfile
@@ -8,6 +9,7 @@ services:
       - json_files:/app/json_files
 
   api:
+    image: bartczaktech/api:latest
     build:
       context: .
       dockerfile: api/Dockerfile
