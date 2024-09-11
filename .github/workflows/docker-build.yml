@@ -26,7 +26,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/WebScraper:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/webscraper:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
       run: cd ${{ secrets.PATH_TO_PROJECT }}
 
     - name: Pull latest Docker image
-      run: docker pull ${{ secrets.DOCKER_USERNAME }}/WebScraper:latest
+      run: docker pull ${{ secrets.DOCKER_USERNAME }}/webscraper:latest
 
     - name: Stop running containers
       run: docker-compose down
