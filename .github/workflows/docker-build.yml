@@ -45,7 +45,13 @@ jobs:
         known_hosts: '${{ secrets.SSH_IP_ADDRESS }}:${{ secrets.SSH_PORT }}'
 
     - name: SSH into server
-      run: ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_IP_ADDRESS }}
+      run: |
+        expect <<- EOF
+        spawn ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_IP_ADDRESS }}
+        expect "Password:
+        send "${{ secrets.SSH_PASSPHRASE }}\r"
+        interact
+        EOF
 
     - name: Navigate to project directory
       run: cd ${{ secrets.PATH_TO_PROJECT }}
