@@ -1,0 +1,1 @@
+"""Module providing project configuration."""
