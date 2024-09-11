@@ -17,7 +17,6 @@ RUN poetry install --no-root --no-dev
 COPY scraper/ scraper/
 COPY utilities/ utilities/
 COPY config/ config/
-COPY logs/ logs/
 COPY json_files/ json_files/
 COPY main.py .
 
