@@ -1,8 +1,6 @@
 """Module including configuration settings for the application."""
 
 import os
-
-import os
 from pathlib import Path
 
 BASE_PATH = Path(os.environ.get("BASE_PATH", "/app")).resolve()
