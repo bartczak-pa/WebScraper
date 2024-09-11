@@ -7,6 +7,7 @@ services:
       dockerfile: scraper/Dockerfile
     volumes:
       - json_files:/app/json_files
+      - ./logs:/app/logs
 
   api:
     image: bartczaktech/api:latest
@@ -15,6 +16,7 @@ services:
       dockerfile: api/Dockerfile
     volumes:
       - json_files:/app/json_files
+      - ./logs:/app/logs
     ports:
       - "8000:8000"
 
