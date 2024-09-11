@@ -16,8 +16,8 @@ class UpdatesScraper(Scraper):
 
     def __init__(self) -> None:
         super().__init__({}, {})
-        self.existing_categories: dict = load_data(Path("json_files/categories.json"))
-        self.existing_recipes: dict = load_data(Path("json_files/parsed_recipes.json"))
+        self.existing_categories: dict = load_data(Path("/app/json_files/categories.json"))
+        self.existing_recipes: dict = load_data(Path("/app/json_files/parsed_recipes.json"))
 
     def check_new_categories(self) -> None:
         """Check for new categories and compare them with dictionary of existing categories."""
@@ -28,7 +28,7 @@ class UpdatesScraper(Scraper):
             if cat not in self.existing_categories
         }:
             logging.info("New categories have been found: %s", ", ".join(new_categories_found.keys()))
-            save_data_to_json(new_categories, "json_files/categories.json")
+            save_data_to_json(new_categories, "/app/json_files/categories.json")
         else:
             logging.info("No new categories have been found.")
 
@@ -52,7 +52,7 @@ class UpdatesScraper(Scraper):
                     "url": url,
                     "content": self.parse_recipe_details(url),
                 }
-            save_data_to_json(self.existing_recipes, "json_files/parsed_recipes.json")
+            save_data_to_json(self.existing_recipes, "/app/json_files/parsed_recipes.json")
             logging.info("Recipes have been saved.")
         else:
             logging.info("No new recipes have been found in %s.", category_name)
