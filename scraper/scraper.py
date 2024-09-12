@@ -98,8 +98,11 @@ class Scraper:
     def parse_recipes_urls(self, category_name: str, category_url: str, pages_amount: int) -> dict:
         """Return recipes titles and URL`s from one category."""
         recipes: dict = {}
-        for page_number in tqdm(range(1, pages_amount + 1), desc=f"Scraping recipes from {category_name}", position=1,
-                                leave=False):
+        recipes_urls_bar = tqdm(total=pages_amount, position=1, desc=category_name, leave=False)
+
+        for page_number in range(1, pages_amount + 1):
+
+            recipes_urls_bar.update(1)
             r = requests.get(f"{category_url}page/{page_number}", timeout=10, headers=self.headers)
             soup = BeautifulSoup(str(r.content), "html.parser")
 
@@ -225,12 +228,14 @@ class Scraper:
 
     def parse_all_recipes_urls(self) -> dict:
         """Return all recipes titles and URL`s from all categories."""
-        for category, values in tqdm(self.categories.copy().items(),
-                                     desc="Scraping recipe URL`s from all categories: ", position=0):
+        all_categories_bar = tqdm(total=len(self.categories), position=0, desc="Categories", leave=False)
+        tqdm.write("Parsing recipes URLs...")
+
+        for category, values in self.categories.copy().items():
             category_name = category
             category_url = values["url"]
             pages_amount = self.check_number_of_pages(category_url)
             self.recipes.update(self.parse_recipes_urls(category_name, category_url, pages_amount))
+            all_categories_bar.update(1)
 
         return self.recipes
-
