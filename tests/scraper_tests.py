@@ -71,23 +71,21 @@ def test_make_request_logging(
 
 
 @pytest.mark.parametrize(
-    ("container","expected_exception"),
+    ("container_html", "expected_exception"),
     [
-        (BeautifulSoup("<div></div>", "html.parser").find_all("div"), CategoriesDivNotFoundError),  # Should raise
-        (BeautifulSoup("<div></div><div></div>", "html.parser").find_all("div"), None),  # Should not raise
-        (BeautifulSoup("<div></div><div></div><div></div>", "html.parser").find_all("div"), None),  # Should not raise
-        (BeautifulSoup("<div></div><div></div><div></div><div></div>", "html.parser").find_all("div"), None),
-        # Should not raise
+        ("<div><p>Item 1</p><p>Item 2</p></div>", None),  # Exactly required length
+        ("<div><p>Item 1</p><p>Item 2</p><p>Item 3</p></div>", None),  # More than required length
+        ("<div><p>Item 1</p></div>", CategoriesDivNotFoundError),  # One less than required
+        ("<div></div>", CategoriesDivNotFoundError),  # Empty container
     ],
-    ids=["one_element_container", "two_elements_container", "three_elements_container", "multiple_elements_container"])
-def test_check_if_content_exists(scraper_instance: Scraper, container: ResultSet, expected_exception: type) -> None:
-    # Act
+    ids=["exact_length", "more_than_required", "one_less_than_required", "empty_container"],
+)
+def test_validate_container_size(container_html: str, expected_exception: type[Exception] | None) -> None:
+    scraper = Scraper(categories={}, recipes={})
+    container: ResultSet = BeautifulSoup(container_html, "html.parser").find_all("p")
+
     if expected_exception:
         with pytest.raises(expected_exception):
-            scraper_instance.validate_container_size(container)
+            scraper.validate_container_size(container)
     else:
-        scraper_instance.validate_container_size(container)
-
-    # Assert
-    if not expected_exception:
-        assert True  # If no exception is raised, the test passes
+        scraper.validate_container_size(container)
