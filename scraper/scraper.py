@@ -19,6 +19,7 @@ class Scraper:
     categories: dict
     recipes: dict
     PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
+    REQUIRED_CONTENT_LENGTH: int = 2
     headers: dict = field(default_factory=lambda: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
     })
@@ -47,10 +48,9 @@ class Scraper:
         return None
 
 
-    @staticmethod
-    def check_if_content_exists(container: ResultSet) -> None:
+    def check_if_content_exists(self, container: ResultSet) -> None:
         """Check if content exists in container."""
-        if len(container) < 2:
+        if len(container) < self.REQUIRED_CONTENT_LENGTH:
             raise CategoriesDivNotFoundError
 
     def parse_category_urls(self) -> dict[str, dict[str, str]]:

@@ -71,22 +71,22 @@ def test_make_request_logging(
 
 
 @pytest.mark.parametrize(
-    ("container", "expected_exception"),
+    ("container","expected_exception"),
     [
-        (BeautifulSoup("<div></div>", "html.parser").find_all("div"), CategoriesDivNotFoundError),
-        (BeautifulSoup("<div></div><div></div>", "html.parser").find_all("div"), None),
-        (BeautifulSoup("<div></div><div></div><div></div>", "html.parser").find_all("div"), None),
+        (BeautifulSoup("<div></div>", "html.parser").find_all("div"), CategoriesDivNotFoundError),  # Should raise
+        (BeautifulSoup("<div></div><div></div>", "html.parser").find_all("div"), None),  # Should not raise
+        (BeautifulSoup("<div></div><div></div><div></div>", "html.parser").find_all("div"), None),  # Should not raise
         (BeautifulSoup("<div></div><div></div><div></div><div></div>", "html.parser").find_all("div"), None),
+        # Should not raise
     ],
-    ids=["one_element_container", "two_elements_container", "three_elements_container", "multiple_elements_container"],
-)
-def test_check_if_content_exists(container: ResultSet, expected_exception: type) -> None:
+    ids=["one_element_container", "two_elements_container", "three_elements_container", "multiple_elements_container"])
+def test_check_if_content_exists(scraper_instance: Scraper, container: ResultSet, expected_exception: type) -> None:
     # Act
     if expected_exception:
         with pytest.raises(expected_exception):
-            Scraper.check_if_content_exists(container)
+            scraper_instance.check_if_content_exists(container)
     else:
-        Scraper.check_if_content_exists(container)
+        scraper_instance.check_if_content_exists(container)
 
     # Assert
     if not expected_exception:
