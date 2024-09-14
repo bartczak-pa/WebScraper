@@ -72,9 +72,8 @@ class Scraper:
                 category_url: str = category_links[0].find("a").get("href")
                 category_urls[category_name] = {"url": category_url}
 
-        self.categories = category_urls
-        logging.info("Found URL's for %d categories.", len(self.categories))
-        return self.categories
+        logging.info("Found URL's for %d categories.", len(category_urls))
+        return category_urls
 
     def get_pages(self, content: BeautifulSoup) -> int:
         """Return amount of pages from container."""
