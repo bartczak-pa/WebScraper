@@ -9,7 +9,7 @@ from scraper.scraper import Scraper  # Import the Scraper class
 from utilities.error_handling import UnknownError
 
 
-@pytest.fixture()
+@pytest.fixture
 def scraper_instance() -> Scraper:
     """Fixture to create an instance of the Scraper."""
     return Scraper(categories={}, recipes={})
