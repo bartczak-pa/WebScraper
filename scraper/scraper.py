@@ -1,11 +1,12 @@
 """Module containing functions for scraping recipes from Bianca Zapatka website."""
+import logging
 import random
 import time
 from dataclasses import dataclass, field
 
 import requests
 from bs4 import BeautifulSoup, ResultSet
-from requests import HTTPError
+from requests import HTTPError, Response
 from tqdm import tqdm
 
 from utilities.error_handling import CategoriesDivNotFoundError, UnknownError
@@ -22,6 +23,30 @@ class Scraper:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
     })
 
+    def make_request(self, url: str, retries: int = 3) -> Response | None:
+        """Make an HTTP GET request to given URL with retries."""
+        for attempt in range(retries):
+            try:
+                r = requests.get(url, timeout=10, headers=self.headers)
+                r.raise_for_status()
+            except requests.exceptions.ConnectionError as err:
+                if attempt < retries - 1:
+                    msg = "Connection error occurred, retrying... (%d/%d)"
+                    logging.warning(msg, attempt + 1, retries)
+                else:
+                    msg = "Connection error occurred after multiple attempts."
+                    raise ConnectionError(msg) from err
+            except requests.exceptions.HTTPError as err:
+                msg = "HTTP error occurred."
+                raise HTTPError(msg) from err
+            except Exception as err:
+                msg = f"Unexpected error occurred: {err}"
+                raise UnknownError(msg) from err
+            else:
+                return r
+        return None
+
+
     @staticmethod
     def check_if_content_exists(container: ResultSet) -> None:
         """Check if content exists in container."""
@@ -34,35 +59,21 @@ class Scraper:
         """Return category names and their URLs."""
         category_urls: dict[str, dict[str, str]] = {}
 
-        try:
-            r = requests.get(self.PAGE_URL, timeout=10, headers=self.headers)
-            r.raise_for_status()
+        r = self.make_request(self.PAGE_URL)
+        soup = BeautifulSoup(r.content, "html.parser")
+        categories_div_content = soup.find_all("section", class_="featuredpost")
+        self.check_if_content_exists(categories_div_content)
 
-        except requests.exceptions.ConnectionError as err:
-            message: str = "Connection error occurred."
-            raise ConnectionError(message) from err
-        except requests.exceptions.HTTPError as err:
-            message: str = "HTTP error occurred."
-            raise HTTPError(message) from err
-        except Exception as err:
-            message: str = f"Unexpected error occurred: {err}"
-            raise UnknownError(message) from err
+        for category in categories_div_content:
+            category_name: str = category.find("h3").text
+            category_links: list = category.find_all("p", class_="more-from-category")
 
-        else:
-            soup = BeautifulSoup(r.content, "html.parser")
-            categories_div_content = soup.find_all("section", class_="featuredpost")
-            self.check_if_content_exists(categories_div_content)
+            if category_links and category_name:
+                category_url: str = category_links[0].find("a").get("href")
+                category_urls[category_name] = {"url": category_url}
 
-            for category in categories_div_content:
-                category_name: str = category.find("h3").text
-                category_links: list = category.find_all("p", class_="more-from-category")
-
-                if category_links and category_name:
-                    category_url: str = category_links[0].find("a").get("href")
-                    category_urls[category_name] = {"url": category_url}
-
-            self.categories = category_urls
-            return category_urls
+        logging.info("Found URL's for %d categories.", len(category_urls))
+        return category_urls
 
     def get_pages(self, content: BeautifulSoup) -> int:
         """Return amount of pages from container."""
@@ -75,21 +86,9 @@ class Scraper:
 
     def check_number_of_pages(self, category_url: str) -> int:
         """Return amount of pages containing recipes from category."""
-        try:
-            r = requests.get(category_url, timeout=10, headers=self.headers)
-            r.raise_for_status()
+        r = self.make_request(category_url)
+        return self.get_pages(BeautifulSoup(r.content, "html.parser"))
 
-        except requests.exceptions.ConnectionError as err:
-            message: str = "Connection error occurred."
-            raise ConnectionError(message) from err
-        except requests.exceptions.HTTPError as err:
-            message: str = "HTTP error occurred."
-            raise HTTPError(message) from err
-        except Exception as err:
-            message: str = f"Unexpected error occurred: {err}"
-            raise UnknownError(message) from err
-        else:
-            return self.get_pages(BeautifulSoup(r.content, "html.parser"))
 
     @staticmethod
     def sleep_for_random_time() -> None:
@@ -104,7 +103,7 @@ class Scraper:
         for page_number in range(1, pages_amount + 1):
 
             recipes_urls_bar.update(1)
-            r = requests.get(f"{category_url}page/{page_number}", timeout=10, headers=self.headers)
+            r = self.make_request(f"{category_url}page/{page_number}")
             soup = BeautifulSoup(str(r.content), "html.parser")
 
             recipe_container = soup.find("div", class_="custom-category-page-wrapper")
@@ -173,7 +172,7 @@ class Scraper:
         }
         recipe_content = {}
 
-        r = requests.get(recipe_url, timeout=10, headers=self.headers)
+        r = self.make_request(recipe_url)
         soup = BeautifulSoup(r.content, "html.parser")
         recipe_container = soup.find("div", class_="wprm-recipe-container")
 

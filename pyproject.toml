@@ -29,6 +29,12 @@ target-version = "py312"
 select = ["ALL"]
 ignore  = ["ANN101", "FIX002", "TD003", "D107", "D103", "N999"]
 
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**/*.py" = [
+    "S101", # asserts allowed in tests
+    "PLR0913", # allow more than 5 arguments in tests
+]
+
 [tool.ruff.format]
 quote-style = "double"
 
