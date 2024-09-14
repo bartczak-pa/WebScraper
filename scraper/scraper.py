@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 import requests
 from bs4 import BeautifulSoup, ResultSet
-from requests import HTTPError, Response
+from requests import HTTPError, Response, Timeout, TooManyRedirects
 from tqdm import tqdm
 
 from utilities.error_handling import CategoriesDivNotFoundError, UnknownError
@@ -40,6 +40,16 @@ class Scraper:
                 else:
                     msg = "Connection error occurred after multiple attempts."
                     raise ConnectionError(msg) from err
+            except Timeout as err:
+                if attempt < retries - 1:
+                    msg = "Request timed out, retrying... (%d/%d)"
+                    logging.warning(msg, attempt + 1, retries)
+                else:
+                    msg = "Request timed out after multiple attempts."
+                    raise Timeout(msg) from err
+            except TooManyRedirects as err:
+                msg = "Too many redirects."
+                raise TooManyRedirects(msg) from err
             except requests.exceptions.HTTPError as err:
                 msg = "HTTP error occurred."
                 raise HTTPError(msg) from err
