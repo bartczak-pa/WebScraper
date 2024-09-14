@@ -22,16 +22,17 @@ class Scraper:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
     })
 
+    @staticmethod
+    def check_if_content_exists(container: ResultSet) -> None:
+        """Check if content exists in container."""
+        try:
+            container[1]
+        except IndexError as error:
+            raise CategoriesDivNotFoundError from error
+
     def parse_category_urls(self) -> dict[str, dict[str, str]]:
         """Return category names and their URLs."""
         category_urls: dict[str, dict[str, str]] = {}
-
-        def check_if_content_exists(container: ResultSet) -> None:
-            """Check if content exists in container."""
-            try:
-                container[1]
-            except IndexError as error:
-                raise CategoriesDivNotFoundError from error
 
         try:
             r = requests.get(self.PAGE_URL, timeout=10, headers=self.headers)
@@ -50,7 +51,7 @@ class Scraper:
         else:
             soup = BeautifulSoup(r.content, "html.parser")
             categories_div_content = soup.find_all("section", class_="featuredpost")
-            check_if_content_exists(categories_div_content)
+            self.check_if_content_exists(categories_div_content)
 
             for category in categories_div_content:
                 category_name: str = category.find("h3").text
