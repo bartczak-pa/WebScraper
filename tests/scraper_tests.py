@@ -84,9 +84,9 @@ def test_check_if_content_exists(scraper_instance: Scraper, container: ResultSet
     # Act
     if expected_exception:
         with pytest.raises(expected_exception):
-            scraper_instance.check_if_content_exists(container)
+            scraper_instance.validate_container_size(container)
     else:
-        scraper_instance.check_if_content_exists(container)
+        scraper_instance.validate_container_size(container)
 
     # Assert
     if not expected_exception:

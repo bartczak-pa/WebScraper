@@ -48,7 +48,7 @@ class Scraper:
         return None
 
 
-    def check_if_content_exists(self, container: ResultSet) -> None:
+    def validate_container_size(self, container: ResultSet) -> None:
         """Check if content exists in container."""
         if len(container) < self.REQUIRED_CONTENT_LENGTH:
             raise CategoriesDivNotFoundError
@@ -60,7 +60,7 @@ class Scraper:
         r = self.make_request(self.PAGE_URL)
         soup = BeautifulSoup(r.content, "html.parser")
         categories_div_content = soup.find_all("section", class_="featuredpost")
-        self.check_if_content_exists(categories_div_content)
+        self.validate_container_size(categories_div_content)
 
         for category in categories_div_content:
             category_name: str = category.find("h3").text
