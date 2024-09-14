@@ -19,7 +19,10 @@ class Scraper:
     categories: dict
     recipes: dict
     PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
+
+    # Number of expected elements in container
     REQUIRED_CONTENT_LENGTH: int = 2
+
     headers: dict = field(default_factory=lambda: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
     })
