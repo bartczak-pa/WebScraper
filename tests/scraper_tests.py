@@ -3,10 +3,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+from bs4 import BeautifulSoup, ResultSet
 from requests import HTTPError
 
 from scraper.scraper import Scraper  # Import the Scraper class
-from utilities.error_handling import UnknownError
+from utilities.error_handling import CategoriesDivNotFoundError, UnknownError
 
 
 @pytest.fixture
@@ -67,3 +68,24 @@ def test_make_request_logging(
             scraper_instance.make_request(url, retries)
 
         assert (expected_log_message in caplog.text)
+
+
+@pytest.mark.parametrize(
+    ("container_html", "expected_exception"),
+    [
+        ("<div><p>Item 1</p><p>Item 2</p></div>", None),  # Exactly required length
+        ("<div><p>Item 1</p><p>Item 2</p><p>Item 3</p></div>", None),  # More than required length
+        ("<div><p>Item 1</p></div>", CategoriesDivNotFoundError),  # One less than required
+        ("<div></div>", CategoriesDivNotFoundError),  # Empty container
+    ],
+    ids=["exact_length", "more_than_required", "one_less_than_required", "empty_container"],
+)
+def test_validate_container_size(container_html: str, expected_exception: type[Exception] | None) -> None:
+    scraper = Scraper(categories={}, recipes={})
+    container: ResultSet = BeautifulSoup(container_html, "html.parser").find_all("p")
+
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            scraper.validate_container_size(container)
+    else:
+        scraper.validate_container_size(container)

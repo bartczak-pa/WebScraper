@@ -19,6 +19,10 @@ class Scraper:
     categories: dict
     recipes: dict
     PAGE_URL: str = "https://biancazapatka.com/en/recipe-index/"
+
+    # Number of expected elements in container
+    REQUIRED_CONTENT_LENGTH: int = 2
+
     headers: dict = field(default_factory=lambda: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ",
     })
@@ -47,13 +51,10 @@ class Scraper:
         return None
 
 
-    @staticmethod
-    def check_if_content_exists(container: ResultSet) -> None:
+    def validate_container_size(self, container: ResultSet) -> None:
         """Check if content exists in container."""
-        try:
-            container[1]
-        except IndexError as error:
-            raise CategoriesDivNotFoundError from error
+        if len(container) < self.REQUIRED_CONTENT_LENGTH:
+            raise CategoriesDivNotFoundError
 
     def parse_category_urls(self) -> dict[str, dict[str, str]]:
         """Return category names and their URLs."""
@@ -62,10 +63,10 @@ class Scraper:
         r = self.make_request(self.PAGE_URL)
         soup = BeautifulSoup(r.content, "html.parser")
         categories_div_content = soup.find_all("section", class_="featuredpost")
-        self.check_if_content_exists(categories_div_content)
+        self.validate_container_size(categories_div_content)
 
         for category in categories_div_content:
-            category_name: str = category.find("h3").text
+            category_name = category.find("h3").text
             category_links: list = category.find_all("p", class_="more-from-category")
 
             if category_links and category_name:
