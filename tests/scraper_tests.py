@@ -3,10 +3,11 @@ from unittest.mock import Mock, patch
 
 import pytest
 import requests
+from bs4 import BeautifulSoup, ResultSet
 from requests import HTTPError
 
 from scraper.scraper import Scraper  # Import the Scraper class
-from utilities.error_handling import UnknownError
+from utilities.error_handling import CategoriesDivNotFoundError, UnknownError
 
 
 @pytest.fixture
@@ -67,3 +68,26 @@ def test_make_request_logging(
             scraper_instance.make_request(url, retries)
 
         assert (expected_log_message in caplog.text)
+
+
+@pytest.mark.parametrize(
+    ("container", "expected_exception"),
+    [
+        (BeautifulSoup("<div></div>", "html.parser").find_all("div"), CategoriesDivNotFoundError),
+        (BeautifulSoup("<div></div><div></div>", "html.parser").find_all("div"), None),
+        (BeautifulSoup("<div></div><div></div><div></div>", "html.parser").find_all("div"), None),
+        (BeautifulSoup("<div></div><div></div><div></div><div></div>", "html.parser").find_all("div"), None),
+    ],
+    ids=["one_element_container", "two_elements_container", "three_elements_container", "multiple_elements_container"],
+)
+def test_check_if_content_exists(container: ResultSet, expected_exception: type) -> None:
+    # Act
+    if expected_exception:
+        with pytest.raises(expected_exception):
+            Scraper.check_if_content_exists(container)
+    else:
+        Scraper.check_if_content_exists(container)
+
+    # Assert
+    if not expected_exception:
+        assert True  # If no exception is raised, the test passes

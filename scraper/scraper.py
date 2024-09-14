@@ -50,10 +50,8 @@ class Scraper:
     @staticmethod
     def check_if_content_exists(container: ResultSet) -> None:
         """Check if content exists in container."""
-        try:
-            container[1]
-        except IndexError as error:
-            raise CategoriesDivNotFoundError from error
+        if len(container) < 2:
+            raise CategoriesDivNotFoundError()
 
     def parse_category_urls(self) -> dict[str, dict[str, str]]:
         """Return category names and their URLs."""
