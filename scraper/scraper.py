@@ -66,7 +66,7 @@ class Scraper:
         self.validate_container_size(categories_div_content)
 
         for category in categories_div_content:
-            category_name: str = category.find("h3").text
+            category_name = category.find("h3").text
             category_links: list = category.find_all("p", class_="more-from-category")
 
             if category_links and category_name:
