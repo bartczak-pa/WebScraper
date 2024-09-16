@@ -38,6 +38,7 @@ jobs:
         no-cache: true
         tags: |
           bartczaktech/api:${{ env.IMAGE_TAG }}
+          bartczaktech/api:latest
 
     - name: Build and push Scraper Docker image
       uses: docker/build-push-action@v4
@@ -48,6 +49,7 @@ jobs:
         no-cache: true
         tags: |
           bartczaktech/scraper:${{ env.IMAGE_TAG }}
+          bartczaktech/scraper:latest
 
   deploy:
     runs-on: ubuntu-latest
