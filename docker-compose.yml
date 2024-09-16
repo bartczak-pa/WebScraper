@@ -3,9 +3,6 @@ services:
   scraper:
     image: bartczaktech/scraper:${IMAGE_TAG}
     restart: always
-    build:
-      context: .
-      dockerfile: scraper/Dockerfile
     volumes:
       - json_files:/app/json_files
       - ./logs:/app/logs
@@ -13,9 +10,6 @@ services:
   api:
     image: bartczaktech/api:${IMAGE_TAG}
     restart: always
-    build:
-      context: .
-      dockerfile: api/Dockerfile
     volumes:
       - json_files:/app/json_files
       - ./logs:/app/logs
