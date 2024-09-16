@@ -27,7 +27,7 @@ jobs:
       - name: Build and push API Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./api
+          context: .
           file: ./api/Dockerfile
           push: true
           tags: |
@@ -37,7 +37,7 @@ jobs:
       - name: Build and push Scraper Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./scraper
+          context: .
           file: ./scraper/Dockerfile
           push: true
           tags: |
