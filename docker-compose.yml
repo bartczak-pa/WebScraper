@@ -1,7 +1,8 @@
 version: '3.8'
 services:
   scraper:
-    image: bartczaktech/scraper:latest
+    image: bartczaktech/scraper:${IMAGE_TAG}
+    restart: always
     build:
       context: .
       dockerfile: scraper/Dockerfile
@@ -10,7 +11,8 @@ services:
       - ./logs:/app/logs
 
   api:
-    image: bartczaktech/api:latest
+    image: bartczaktech/api:${IMAGE_TAG}
+    restart: always
     build:
       context: .
       dockerfile: api/Dockerfile
