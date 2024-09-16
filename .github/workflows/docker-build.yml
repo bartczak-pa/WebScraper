@@ -36,6 +36,7 @@ jobs:
           context: .
           file: ./api/Dockerfile
           push: true
+          no-cache: true
           tags: |
             bartczaktech/api:${{ env.IMAGE_TAG }}
             bartczaktech/api:latest
@@ -46,6 +47,7 @@ jobs:
           context: .
           file: ./scraper/Dockerfile
           push: true
+          no-cache: true
           tags: |
             bartczaktech/scraper:${{ env.IMAGE_TAG }}
             bartczaktech/scraper:latest
